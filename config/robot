@@ -1,0 +1,8 @@
+[network]
+reset = 0
+
+[robot]
+motor1 = 100
+motor2 = 100
+motor3 = 100
+motor4 = 100

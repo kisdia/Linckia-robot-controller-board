@@ -1,0 +1,65 @@
+<div style="border-top: 1px dotted #ccc;padding-top: 20px;">
+
+<h3>Display value from...</h3>
+<div class="controlgroup">
+                
+    
+        <div class="half_column">
+            <div class="customdropdown">
+                <select id="inputsource" >
+                    <option value="Analog1">Analog 1</option>
+                    <option value="Analog2">Analog 2</option>
+                    <option value="Analog3">Analog 3</option>
+                    <option value="Analog4">Analog 4</option>
+                    <option value="Analog5">Analog 5</option>
+                </select>
+            </div>
+        </div>
+        <div class="half_column">&nbsp;</div>
+    
+        <br><br>
+        <div class="full_column">
+            <div class="customcheckbox">
+                <input type="checkbox" id="applyspeed" value="1"> <label class="inline" for="applyspeed">Apply linear scaling - fill in equation below</label> 
+            </div>
+        </div>
+        
+        <br>
+        <div class="full_column">
+            Linear scaling ( a / b * x + c ) <input type="text" id="scalling-a" placeholder="a" style="width:60px;"> / <input type="text" id="scalling-b" placeholder="b" style="width:60px;"> * x + <input type="text" id="scalling-c" placeholder="c" style="width:60px;">
+        </div> 
+     
+</div>
+
+</div>
+
+
+<script>
+                
+rowid = $('#currentrowid').val(); 
+
+if( Array.isArray(sessionPreferences) == true)
+{
+
+    for (var i = 0; i < sessionPreferences.length; i++) 
+    {
+        var row = sessionPreferences[i];
+
+        if( row.id == rowid)
+        {
+            $('#inputsource').val(row.data.inputsource); 
+            $('#applyspeed').prop( "checked", row.data.applyspeed );  
+            $('#scalling-a').val(row.data.scallinga);
+            $('#scalling-b').val(row.data.scallingb);
+            $('#scalling-c').val(row.data.scallingc);
+             
+             
+        }
+
+    }
+
+
+} 
+    
+    
+</script>

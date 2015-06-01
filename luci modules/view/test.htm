@@ -1,0 +1,355 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2010 Jo-Philipp Wich <xm@subsignal.org>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	$Id$
+	
+	-%>
+
+<%+header%>
+<body onload="action_read()">
+
+<style>
+
+#analogue {
+border-collapse: collapse;
+}
+
+#analogue td {
+border: 1px solid black;
+}
+
+.element {
+border: 5px solid gray;
+}
+.element tr {
+
+border : 0px;
+margin: 0px;
+}
+
+
+
+input {
+
+font-size: 35px;
+}
+
+#rightServos {
+float: right;
+position: relative;
+text-align: left;
+width: 450px;
+
+}
+
+#left {
+padding: 10px;
+position: relative;
+margin-right:470px;
+}
+
+
+@media only screen 
+and (min-device-width : 320px) 
+and (max-device-width : 480px) {
+/* Styles */
+.element {
+border: 0px solid gray;
+margin-left: 20%;
+}
+
+
+}
+
+</style>
+
+<form id="the_form">
+
+<h1> Robot2 </h1>
+<div id = "rightServos">
+	<div class= "element">
+
+		<label style="font-size:30px;font-weight:bold;">Battery: </label><label style="font-size:30px;font-weight:bold;" id="batteryTxt" > </label><label style="font-size:14px;font-weight:bold;">volts </label>
+	</div>
+	<br />
+	<div class="element">
+	<table>
+		<tr>
+			<td><h2>Servos</h2></td>
+			<td><h2>Time To Position</h2></td>
+		</tr>
+		<tr>
+			<td> <input type="checkbox" name="radioSer" value="S1" />  S1   <input class="spinner spinServosPWM" id= "SpinS1" value = "1000 " /></td>
+			<td> <input class="spinner spinRampTime" id= "TimeS1" value = "0 " /> </td>
+		</tr>
+		<tr>
+			<td><input type="checkbox" name="radioSer" value="S2" />  S2   <input class="spinner spinServosPWM" id= "SpinS2" value = "1000" /></td>
+
+			<td> <input class="spinner spinRampTime" id= "TimeS2" value = "0" /> </td>
+		</tr>
+		<tr>
+			<td> <input type="checkbox" name="radioSer" value="S3" />  S3   <input class="spinner spinServosPWM" id= "SpinS3" value = " 1000 " /></td>
+			<td> <input class="spinner spinRampTime" id= "TimeS3" value = " 0 " /> </td>
+		</tr>
+		<tr>
+			<td><h3 id="LblServos"> 1000-2000 </h3></td>
+			<td> <h3>  0 TO 30  </h3> </td>
+		</tr>
+		<tr>
+			<td>
+			</td>
+			<td><input type="button" value= " PWM " id = "btnServos" onclick="changeType()" style = "padding:10px;"/></td>
+
+		</tr>
+
+	</table>
+	</div>
+
+</div>
+
+<h1> Motors </h1>
+<div class="element" id="left">
+		<table > 
+			<tr>
+				<td><h2> Motors  </h2>  (% POWER) </td><td> <h2> RAMP UP TIME(S)  <h2> </td>
+			</tr>
+
+			<tr>
+				<td> <input type="checkbox" name="radioMot" value="M1" />  M1   <input class="spinner spinMotors" id= "SpinM1" value = "0" /> </td>
+				<td> <input class="spinner spinRampTime" id= "TimeM1" value = "0" /> </td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="radioMot" value="M2" />  M2   <input class="spinner spinMotors" id= "SpinM2" value = "0" /> </td>
+				<td> <input class="spinner spinRampTime" id= "TimeM2" value = "0" /> </td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="radioMot" value="M3" /> M3   <input class="spinner spinMotors" id= "SpinM3" value = "0" /></td>
+				<td> <input class="spinner spinRampTime" id= "TimeM3" value = "0" /> </td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="radioMot" value="M4" /> M4   <input class="spinner spinMotors" id= "SpinM4" value = "0" /></td>
+				<td> <input class="spinner spinRampTime" id= "TimeM4" value = "0" /> </td>
+			</tr>
+			<tr>
+				<td> <h3>  -100 TO 100  </h3> </td><td> <h3>  0 TO 30  </h3> </td>
+			</tr>
+		</table>
+	
+</div>
+<br />
+<br />
+<div >
+
+<table id = "analogue" style="width:100%">
+<tr><td><h2>A0</h2></td><td><h2>A1</h2></td><td><h2>A2</h2></td><td><h2>A3</h2></td><td><h2>A4</h2></td><td><h2>A5</h2></td>
+</tr><tr><td id="firstAna"> </td><td id="Ana2"> </td><td id="Ana3"> </td><td id="Ana4"> </td><td id="Ana5"></td><td id="Ana6"> </td></tr></table>
+</div>
+
+<input type="button" value="SEND" onclick="action_send(this.value)" style="width:100%; height:50px; padding: 10px;">
+<br />
+<br />
+
+<input type="button" value="STOP" onclick="action_send(this.value)"  style="width:100%; height:50px; padding: 10px;">
+
+
+
+</form>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script src="<%=resource%>/external/jquery/jquery.js"></script>
+<script src="<%=resource%>/jquery-ui.js"></script>
+
+<script type= "text/JavaScript">//<![CDATA[
+
+
+function action_read()
+{
+	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "robot", "distance","read")%>', null,
+		function(x, data)
+		{
+			document.getElementById("firstAna").innerHTML = data[0];
+			
+			document.getElementById("Ana2").innerHTML = data[1];
+			
+			document.getElementById("Ana3").innerHTML = data[2];
+			
+			document.getElementById("Ana4").innerHTML = data[3];
+			
+			document.getElementById("Ana5").innerHTML = data[4];
+			
+			document.getElementById("Ana6").innerHTML = data[5];
+			document.getElementById("batteryTxt").innerHTML = data[5];													
+		}
+	);
+						
+	
+}
+
+function action_send(valueOfButton){
+
+
+var fullCommand = "";
+var servoCommand = "";
+var allValid = true;
+
+if(valueOfButton == "SEND")
+{
+	var radioMot =document.getElementsByName("radioMot");
+	var radioSer = document.getElementsByName("radioSer");
+	var completeStringMot = "";
+	var completeStringSer = "";
+
+	var noOfMotors = 0;
+	var MotNum = "";
+	var directionMotor = "";
+	var MotorValue = 0;
+	var power = "";
+	var time1 = 0;
+	var time2 = 0;
+	var time1Str = "";
+	var time2Str = "";
+
+
+	for(var i = 0; i < radioMot.length; i++){
+
+		if(radioMot[i].checked){
+
+			noOfMotors +=1;
+
+			MotNum = String(i+1) + ",";
+		        
+		        var id = "#Spin".concat(radioMot[i].value);
+			MotorValue = ($(id).spinner("value"));
+
+			if(MotorValue < 0){
+				directionMotor = "1,";
+				MotorValue = MotorValue + 110;
+
+			}
+			else{
+
+				directionMotor = "0,";
+			}
+
+			MotorValue = MotorValue*2.5;
+			power = MotorValue.toString() + ",";
+
+			var timeId = "#Time".concat(radioMot[i].value);
+			var time = $(timeId).spinner("value");
+			time1 = parseInt(time);
+			time1Str = time1.toString() + ",";
+			time2 = time - time1;
+			time2 = Math.round( time2 * 100);
+			time2Str = time2.toString() + ",";
+
+			fullCommand +=  MotNum + directionMotor + power + time1Str + time2Str + "''',";
+			if( MotorValue > 250 || time1 > 30 || time2>59)
+			{
+				allValid = false;				
+			}
+		}
+	}	
+	
+	var servoNum = 0;
+	for(var j = 0; j < radioSer.length; j++){
+	
+	if(radioSer[j].checked){
+	
+	servoNum = j+1;
+	
+	var serId = "#Spin".concat(radioSer[j].value);
+	var SerValue = ($(serId).spinner("value"));
+	var serTimeId = "#Time".concat(radioSer[j].value);
+	var serTime = $(serTimeId).spinner("value");
+	var serTime1 = parseInt(serTime);
+	var serTime2 = serTime - serTime1;
+	serTime2 = Math.round( serTime2 * 100);
+	servoCommand = servoNum + "," + SerValue + "," + serTime1 + "," + serTime2 + ",";
+	
+	if( parseInt(SerValue) > 250 || serTime1 > 30 || serTime2>59)
+	{
+	         allValid = false;
+	}
+	break;
+	
+	}
+	
+	}
+	
+	
+}
+else{
+
+	if(valueOfButton == "STOP")
+	{
+		fullCommand = "STOP";
+	}
+}
+
+if(allValid == true)
+{
+var xmlhttp=new XMLHttpRequest();
+xmlhttp.open("POST","<%=controller%>/admin/robot/distance/write",true);
+xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+xmlhttp.send("command=" + fullCommand + "&commandSer=" + servoCommand);
+}
+else
+{
+	alert("Error: Please stick within the range of acceptable numbers provided ");
+	alert("HINT: PWM is not working at the moment so please switch to servo mode - to do this click on the button labeled as 'PWM'");
+}
+
+}
+$( ".spinner.spinMotors" ).spinner({
+min: -100, max: 100, step: 1
+});
+
+$( ".spinner.spinServosPWM" ).spinner({
+min: 1000, max: 2000, step: 1
+});
+
+$( ".spinner.spinRampTime" ).spinner({
+min: 0, max: 30, step: 1
+});
+
+$( ".spinner" ).width(85);
+$( ".spinner" ).height(65);
+
+
+function changeType(){
+if($("#btnServos").attr("value")== " PWM ")
+{
+$("#btnServos").attr('value', 'Servo');
+$("#LblServos").text("0-256");
+$( ".spinner.spinServosPWM" ).spinner({
+
+min: 0, max: 256, step: 1
+});
+$( ".spinner.spinServosPWM" ).attr('value', '0');
+}
+else if($("#btnServos").attr("value")== "Servo")
+{
+$("#btnServos").attr('value', ' PWM ');
+$("#LblServos").text("1000-2000");
+$( ".spinner.spinServosPWM" ).spinner({
+min: 1000, max: 2000, step: 1
+});
+$( ".spinner.spinServosPWM" ).attr('value', '1000');
+}
+else{
+alert("hello " + $("#btnServos").attr("value"));
+}
+}
+
+;//]]></script>
+</body>
+<%+footer%>
+
+

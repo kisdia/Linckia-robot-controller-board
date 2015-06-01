@@ -1,0 +1,105 @@
+<div class="half_column">
+     <label>Label</label>
+     <input type="text" id="buttonlabel" placeholder="" style="width:150px;" value="">
+</div>
+<div class="clearfix clear"></div>
+
+<div style="border-top: 1px dotted #ccc;padding-top: 20px;">
+
+<h3>When button is pressed...</h3>
+<div class="controlgroup">
+                  
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>DC Motors</th>
+                <th scope="col">Speed <span>-100 to 100%</span></th>
+                <th scope="col">Ramp up <span>0 to 30Sec</span></th>
+            </tr>
+            <tr>
+                <td>DC Motor 1</td>
+                <td> 
+                    <div class="customcheckbox">
+                        <input type="checkbox" id="dcmotor1-speed" value="1"> <label class="inline" for="dcmotor1-speed">Speed</label>
+                    </div>
+                </td>
+                <td>
+                    <div class="customcheckbox">
+                    <input type="checkbox" id="dcmotor1-rampup" value="1"> <label class="inline" for="dcmotor1-rampup">Ramp Up</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>DC Motor 2</td>
+                <td>
+                    <div class="customcheckbox">
+                        <input type="checkbox" id="dcmotor2-speed" value="1"> <label class="inline" for="dcmotor2-speed">Speed</label>
+                    </div>
+                </td>
+                <td>
+                    <div class="customcheckbox">
+                        <input type="checkbox" id="dcmotor2-rampup" value="1"> <label class="inline" for="dcmotor2-rampup">Ramp Up</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>DC Motor 3</td>
+                <td>
+                    <div class="customcheckbox">
+                        <input type="checkbox" id="dcmotor3-speed" value="1"> <label class="inline" for="dcmotor3-speed">Speed</label>
+                    </div>
+                </td>
+                <td><div class="customcheckbox">
+                        <input type="checkbox" id="dcmotor3-rampup" value="1"> <label class="inline" for="dcmotor3-rampup">Ramp Up</label>
+        </div></td>
+            </tr>
+            <tr>
+                <td>DC Motor 4</td>
+                <td><div class="customcheckbox">
+                        <input type="checkbox" id="dcmotor4-speed" value="1"> <label class="inline" for="dcmotor4-speed">Speed</label>
+        </div></td>
+                <td><div class="customcheckbox">
+                        <input type="checkbox" id="dcmotor4-rampup" value="1"> <label class="inline" for="dcmotor4-rampup">Ramp Up</label>
+        </div></td>
+            </tr>
+
+        </table> 
+</div>
+
+</div>
+
+<script>
+                
+rowid = $('#currentrowid').val(); 
+
+if( Array.isArray(sessionPreferences) == true)
+{
+
+    for (var i = 0; i < sessionPreferences.length; i++) 
+    {
+        var row = sessionPreferences[i];
+
+        if( row.id == rowid && row.type == 'Button')
+        {
+          
+            $('#buttonlabel').val( row.data.buttonlabel ); 
+            $('#dcmotor1-speed').prop( "checked", row.data.dcmotor1.speed ); 
+            $('#dcmotor2-speed').prop( "checked", row.data.dcmotor2.speed ); 
+            $('#dcmotor3-speed').prop( "checked", row.data.dcmotor3.speed ); 
+            $('#dcmotor4-speed').prop( "checked", row.data.dcmotor4.speed ); 
+            
+            $('#dcmotor1-rampup').prop( "checked", row.data.dcmotor1.rampup ); 
+            $('#dcmotor2-rampup').prop( "checked", row.data.dcmotor2.rampup ); 
+            $('#dcmotor3-rampup').prop( "checked", row.data.dcmotor3.rampup ); 
+            $('#dcmotor4-rampup').prop( "checked", row.data.dcmotor4.rampup ); 
+            
+             
+             
+        }
+
+    }
+
+
+} 
+    
+    
+</script>

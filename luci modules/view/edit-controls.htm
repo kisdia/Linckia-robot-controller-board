@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<!--[if IE 6]>
+<html id="ie6" class="ie" lang="en-US">
+<![endif]-->
+<!--[if IE 7]>
+<html id="ie7" class="ie" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" class="ie" lang="en-US">
+<![endif]-->
+<!--[if IE 9]>
+<html id="ie9" class="ie" lang="en-US">
+<![endif]-->
+<!--[if !(IE 6) | !(IE 7) | !(IE 8) | !(IE 9) ]><!-->
+<html lang="en-US">
+<!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0 user-scalable=no">
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<title>Linkia robot custom controllers</title>
+
+<link rel="shortcut icon" href="images/favicon.png">
+
+<link rel="stylesheet" href="<%=resource%>/css/font-awesome.min.css">
+<link rel="stylesheet" href="<%=resource%>/css/jquery.gridster.css">
+<link rel="stylesheet" href="<%=resource%>/css/style.css">
+<link rel="stylesheet" href="<%=resource%>/css/media.css">
+
+<!--[if IE]>
+    <script type="<%=resource%>/ie/selectivizr.js"></script>
+    <noscript><link rel="stylesheet" href="[fallback css]" /></noscript>
+<![endif]-->
+
+<!--[if lt IE 9]>    
+    <script src="<%=resource%>/ie/html5shiv.js"></script>
+    <script src="<%=resource%>/ie/respond.min.js"></script>
+<![endif]-->
+
+<script type="text/javascript" src="<%=resource%>/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="<%=resource%>/js/jquery.gridster.js"></script>
+<script type="text/javascript" src="<%=resource%>/js/jquery.draggable.js"></script>
+<script type="text/javascript" src="<%=resource%>/js/custom.js"></script>
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    
+        sessionPreferences = getPreferenceData('controls');
+       
+        if( $(".gridster ul").size()>0){
+        
+            
+		gridster1 = $(".gridster1 > ul").gridster({
+			widget_margins: [5, 5],
+			widget_base_dimensions: [115, 115],
+			min_cols: 3,
+                        draggable: {
+                            stop: function(e, ui, $widget) {
+                                 
+                                 var sdata = gridster1.serialize();
+                                 
+                                 
+                                 for(i=0;i < sdata.length; i++)
+                                 {
+
+                                     console.log(sessionPreferences[i].row+' = '+sdata[i].row);
+                                     sessionPreferences[i].col = sdata[i].col;  
+                                     sessionPreferences[i].row = sdata[i].row;  
+                                     sessionPreferences[i].size_x = sdata[i].size_x;  
+                                     sessionPreferences[i].size_y = sdata[i].size_y;  
+     
+                                 } 
+
+                                 savePreferenceData('controls', sessionPreferences);
+                                 
+                            }
+                        }
+		}).data('gridster');
+	};
+        fillBoxesEditable();
+    });
+	
+function onload(){
+        read_wifi();
+        read_analog();
+        alert("This is a preview of functionality that will be added in software updates at a later date");
+}
+
+function read_wifi(){
+        XHR.poll(5, '<%=luci.dispatcher.build_url("admin","robot","distance","wifi")%>', null,
+                 function(x, data)
+                 {
+                        var signal = Number(data);
+                        //document.getElementById('wifiTxt').innerHTML = String(data);
+                        //document.getElementById('wifiGauge').setAttribute("style" , "width: 50%;");
+                        var percentage = 100;
+                        if (signal>50){
+                            percentage = 100-2*(signal-50);
+                        }
+                        if (signal== null){
+                            percentage = 0;
+                        }
+                        if (percentage>0){
+                            document.getElementById('wifiTxt').innerHTML = "WIFI " +String(percentage)+"%";
+                            document.getElementById('wifiGauge').setAttribute("style" , "width: "+ String(percentage)+"%;");
+                        } else {
+                            document.getElementById('wifiTxt').innerHTML = "NOT CONNECTED";
+                            document.getElementById('wifiGauge').setAttribute( "style", "width: 0%;");
+                        }
+                        
+                 }
+        );
+}
+
+function read_analog(){
+        XHR.poll(5, '<%=luci.dispatcher.build_url("admin","robot","distance","read")%>', null,
+                 function(x, data)
+                 {      
+                        var battery = (Number(data[5])*49/10000).toFixed(2);
+                        var percentage = 100;
+                        //document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(battery)+"V";
+                        if (battery<4.0){
+                            if (battery>3.1){
+                                percentage = Math.round((battery-3.1)*111);
+                            } else {
+                                percentage = 0;
+                            }
+                        }
+                        if (battery<2.7){
+                            document.getElementById('batteryTxt').innerHTML = "NOT CONNECTED";
+                        }
+                    document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(percentage)+"%";    
+		document.getElementById('batteryGauge').setAttribute("style" , "width: "+String(percentage)+"%;");
+                 }
+        );
+
+}
+
+</script>
+</head>
+
+<body class="editMyControls" onload="onload()">
+
+<!--Header start-->
+<header class="topheader">
+	<!--top header start-->
+    	<a class="menubarHandler" href="javascript:void(0)">Menu</a>
+        <nav class="top_menu">
+            <div class="container">
+                <div class="row">
+                
+                    <div class="col span_4">
+                            <div class="inner dashboard">
+                               <a href='<%=luci.dispatcher.build_url("admin/robot/index")%>'> 
+                                    <span class="icon"><i class="fa fa-dashboard"></i></span>
+                                    <h4>Dashboard</h4>
+                                </a>
+                            </div>
+                        </div>
+                        
+                	<div class="col span_4">
+                        <div class="inner startdriving">
+                            <a href='<%=luci.dispatcher.build_url("admin/robot/distance")%>'> 
+                                <span class="icon"><i class="fa fa-gamepad"></i></span>
+                                <h4>START DRIVING</h4>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col span_4">
+                        <div class="inner customcontros">
+                            <a href='<%=luci.dispatcher.build_url("admin/robot/mycontrols")%>'> 
+                                <span class="icon"><i class="fa fa-gamepad rotated"></i><i class="fa fa-gamepad"></i></span>
+                                <h4>CUSTOM CONTROLS</h4>  
+                            </a>                          
+                        </div>
+                    </div>
+                    <div class="col span_4">
+                        <div class="inner">
+                            <a href='<%=luci.dispatcher.build_url("admin/robot/edit-controls")%>'> 
+                                <span class="icons-css"><i class="fa fa-wrench"></i></span>
+                                <h4>EDIT MY CONTROLLER</h4>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col span_4">
+                        <div class="inner">
+                            <a href='<%=luci.dispatcher.build_url("admin/robot/help")%>'> 
+                                <span class="icons-css"><i class="fa fa-info-circle"></i></span>
+                                <h4>HELP &amp; MANUAL</h4>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col span_4">
+                        <div class="inner">
+                            <a href='<%=luci.dispatcher.build_url("admin/robot/settings")%>'> 
+                                <span class="icons-css"><i class="fa fa-gear"></i></span>
+                                <h4>SETTINGS</h4>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col span_4">
+                        <div class="inner">
+                            <a href='<%=luci.dispatcher.build_url("admin/status/overview")%>'> 
+                                <span class="icons-css"><i class="fa fa-wifi"></i></span>
+                                <h4>ROUTER SETUP</h4>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col span_4">
+                        <div class="inner">
+                            <a href='<%=luci.dispatcher.build_url("admin/robot/editor")%>'> 
+                                <span class="icons-css"><i class="fa fa-pencil"></i></span>
+                                <h4>WRITE CODE</h4>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col span_4">
+                        <div class="inner">
+                            <a href='<%=luci.dispatcher.build_url("admin/logout")%>'> 
+                                <span class="icons-css"><i class="fa fa-sign-out"></i></span>
+                                <h4>Log Out</h4>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="smallLogo"><img src="<%=resource%>/images/smallogoblue.png" alt=""></div>
+        
+        <div class="header-battery">  
+            <div class="wifi-battery-text" id="batteryTxt"> BATTERY 100% </div>
+            <div class="battery" id="batteryGauge" style="width: 100%;"></div>
+        </div>
+        
+        
+        <div class="header-wifi">  
+            <div class="wifi-battery-text" id="wifiTxt"> WIFI 100% </div>
+            <div class="wifi" id="wifiGauge" style="width: 100%;"></div>
+        </div>
+        
+    <!--top header END-->
+</header>  
+
+    <!--Content part start-->
+    <div class="main_content my_controls">
+    	<div class="container">
+        <div class="row control_handlers">
+        	<div class="col span_12 text_center">
+                <button class="left addItem" style="">Add Item</button>
+               
+            	<button class="right"  onclick="window.location.href='mycontrols'">SAVE AND GO BACK</button>
+            	
+            </div>
+        </div>
+        <div class="row">
+            <div class="col span_12">
+            	<div class="gridster gridster1">
+                <ul>
+                    
+                    
+                </ul>
+                </div>
+            </div>  
+            
+           
+             
+        </div>
+            
+        </div>
+    </div>
+    <!--Content part end-->
+ 
+<!--Footer start-->
+<footer>
+	<div class="container">
+    	<div class="row">
+        	<div class="col span_4">
+            	<img src="<%=resource%>/images/sciencetechnology.png" alt="">
+            </div>
+            
+        	<div class="col span_4 footer-logo-mid" >
+            	<img src="<%=resource%>/images/activerobotsdark.png" alt="">
+            </div>
+            
+            <div class="col span_4 right text_right">
+            	<img src="<%=resource%>/images/ralspacelogo.png" alt="">
+            </div>
+        </div>
+    </div>
+</footer>
+<!--Footer end-->
+
+
+<div class="popup"></div>
+
+
+</div>
+</body>
+</html>

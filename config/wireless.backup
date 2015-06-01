@@ -1,0 +1,15 @@
+
+config wifi-device 'radio0'
+	option type 'mac80211'
+        option path 'platform/ar933x_wmac'
+	option htmod 'HT20'
+        option country 'GB'
+        option channel 'auto'
+	
+config wifi-iface
+	option device 'radio0'
+	option network 'lan'
+	option mode 'ap'
+	option ssid 'Robot'
+	option encryption 'none'
+

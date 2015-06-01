@@ -1,0 +1,62 @@
+<div style="border-top: 1px dotted #ccc;padding-top: 20px;">
+
+<h3>Display value from...</h3>
+<div class="controlgroup">
+                
+    
+        <div class="half_column">
+            <div class="customdropdown">
+                <select id="inputsource" >
+                    <option value="video1">Video 1</option>
+                    <option value="video2">Video 2</option>
+                    <option value="video3">Video 3</option>
+                </select>
+            </div>
+        </div>
+        <div class="half_column">&nbsp;</div>
+
+        <br>
+        <div class="full_column">
+            Resolution: <input type="text" id="resolution" placeholder="320x240" style="width:120px;">
+	    <br>
+	   Frames per second (fps): <input type="text" id="fps" placeholder="10" style="width:120px;">
+             <br>
+	   Quality (if yuv set to 80):<input type="text" id="quality" placeholder="100" style="width:120px;">
+	   <br>
+	   Port:<input type="text" id="port" placeholder="8080" style="width:120px;">
+        </div> 
+     
+</div>
+
+</div>
+
+
+<script>
+                
+rowid = $('#currentrowid').val(); 
+
+if( Array.isArray(sessionPreferences) == true)
+{
+
+    for (var i = 0; i < sessionPreferences.length; i++) 
+    {
+        var row = sessionPreferences[i];
+
+        if( row.id == rowid)
+        {
+            $('#inputsource').val(row.data.inputsource); 
+            $('#resolution').val(row.resolution);
+            $('#fps').val(row.data.fps);
+            $('#quality').val(row.data.quality);
+	  $('#port').val(row.data.port);
+             
+             
+        }
+
+    }
+
+
+} 
+    
+    
+</script>

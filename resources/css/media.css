@@ -1,0 +1,176 @@
+@media only screen and (max-width:767px){
+	.container{
+		width:100%;
+		padding:0 20px;	
+	}
+	.logo_part{
+		padding-top:10px;	
+	}
+	a.logo{
+		max-width:100%;
+		background-size:contain;
+		margin-top:0;	
+	}
+	.distancecontainer{
+		width: 178px;
+	}
+	.half_column{
+		width:100%;	
+	}
+
+	.col{
+		width:100%;
+		margin-bottom:20px;	
+		float:none;
+		text-align:center;
+	}
+	.bannerpart{
+		height:auto;	
+	}
+	.brand{
+		text-align:center;	
+	}
+	
+	.top_menu .col .inner{
+		padding:0;	
+		border:0;
+		background:none;
+	}
+	.top_menu i{
+		display:none;
+	}
+	.top_menu .dashboard i, .top_menu .startdriving i, .top_menu .customcontros i{
+		font-size:30px;
+		margin-bottom:0;
+		display:inline-block;	
+		vertical-align: middle;
+	}
+	span.icon{
+		display:inline-block;	
+	}
+	.top_menu .col .inner h4{
+		display:inline-block;	
+	}
+	i.fa.fa-gamepad.rotated{
+		top:-3px;
+		left:-15px;	
+	}
+	.top_menu .col .inner h4{
+		font-size:14px;
+		text-transform:uppercase;
+		font-weight:normal;	
+	}
+	.top_menu .inner.dashboard h4, .top_menu .inner.startdriving h4, .top_menu .inner.customcontros h4{
+		font-size:16px;
+		text-transform:uppercase;
+		font-weight:bold;
+	}
+	nav.top_menu{
+		padding:50px 20px;	
+	}
+	.controls .col.sep-left, .col.span_3-5.right, .col.span_4-5.sep-right.left{
+		float:none;
+		margin:0 auto 20px;
+		border-left:0;
+		border-right:0;
+		padding-left:0;
+		padding-right:0;
+	}
+	.arm_attachmemt, .distancecontainer, .maincontrols{
+		margin:0 auto;	
+	}
+	.sep-right:before {
+		height: 1px;
+		width: 100%;
+		right: 0;
+		top: 0;
+	}
+	.sep-left:before {
+		height: 1px;
+		width: 100%;
+		left: 0;
+		top: auto;
+		bottom: -15px;
+	}
+       
+
+}
+
+@media only screen and (max-width:650px){ 
+
+    .header-wifi{ width: 85px; }
+    .header-battery{ width: 85px; }
+    .popup{margin-left: -258px;}
+}
+
+@media only screen and (max-width:479px){
+	button.save, button.cancel, button.left{
+		width:auto;
+		display:block;
+		float:none;
+		margin:0 auto 10px;
+	}
+	.controlgroup table td, .controlgroup table th{
+		padding:8px 2px;
+		font-size:11px;	
+		line-height:12px;
+	}
+	.controlgroup{
+		font-size:11px;	
+	}
+	.popup{
+		padding:10px;	
+                margin-left: -189px;
+	}
+	.popup_content{
+		padding-top:30px;	
+	}
+	.popup_content h3{
+		font-size:14px;	
+	}
+	a.close_pop{
+		top:-10px;
+		right:-10px;	
+	}
+	.controlgroup table th span{
+		display:block;
+		margin-left:0;	
+	}
+	.control_handlers button, .control_handlers a.mycontroler{
+		float:none;
+		display:block;
+		width:auto;
+		margin:10px;
+	}
+	.control_handlers .text_center button{
+		float:left;
+	}
+	.smallLogo{
+		display:none;	
+	}
+	.header-wifi{ width: 85px; }
+	.header-battery{ width: 85px; }
+
+	.edit_controls, .my_controls{
+		background:url(../images/cntbg.png) 0 0 repeat ;
+	}
+        
+}
+
+@media only screen and (max-width: 320px){ 
+.popup {
+padding: 10px;
+margin-left: -124px;
+}
+
+.edit_controls, .my_controls{
+	background:url(../images/cntbg.png) 0 0 repeat ;
+}
+}
+
+
+@media only screen and (max-width: 440px){ 
+.popup {
+margin-left: -172px;
+}
+}

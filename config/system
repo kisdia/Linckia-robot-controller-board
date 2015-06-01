@@ -1,0 +1,52 @@
+
+config system
+	option hostname 'Robot'
+	option zonename 'UTC'
+	option timezone 'GMT0'
+	option conloglevel '8'
+	option cronloglevel '8'
+
+config timeserver 'ntp'
+	list server '0.openwrt.pool.ntp.org'
+
+config led
+	option sysfs 'carambola2:green:wlan'
+	option name 'wlan'
+	option trigger 'heartbeat'
+	option default '0'
+
+config led
+	option default '0'
+	option name 'eth0'
+	option sysfs 'carambola2:orange:eth0'
+	option trigger 'netdev'
+	option mode 'link tx rx'
+	option dev 'eth0'
+
+config led
+	option default '0'
+	option name 'eth1'
+	option sysfs 'carambola2:orange:eth1'
+	option trigger 'netdev'
+	option mode 'link tx rx'
+	option dev 'eth1'
+
+config led 'led_lan'
+	option name 'LAN'
+	option sysfs 'carambola2:orange:eth0'
+	option trigger 'netdev'
+	option dev 'eth0'
+	option mode 'link tx rx'
+
+config led 'led_wan'
+	option name 'WAN'
+	option sysfs 'carambola2:orange:eth1'
+	option trigger 'netdev'
+	option dev 'eth1'
+	option mode 'link tx rx'
+
+config led 'led_wlan'
+	option name 'WLAN'
+	option sysfs 'carambola2:green:wlan'
+	option trigger 'heartbeat'
+

@@ -1,0 +1,83 @@
+<div class="popup_content">
+    <a href="javascrip:void(0);" class="close_pop" onclick="removePoup();"></a>
+           
+            <h3>ADD / EDIT CONTROL ELEMENT</h3>
+            <div class="controlgroup" style="border: none;margin-bottom: 0;">
+                <div class="half_column">
+                    <label>Title</label>
+                    <input type="text" id="input-label">
+                </div>
+
+                <div class="half_column">
+                    <label>Type</label>
+                    <div class="customdropdown">
+                        <select id="display-type">
+                            <option value=""></option>
+                            <option value="Button">Button</option>
+                            <option value="Number">Number</option>
+                            <option value="Number (slider)">Number (slider)</option>
+                            <option value="Display">Display</option>
+                            <option value="Display (webcam)">Display (webcam)</option>  
+                        </select>
+                    </div>
+                </div>
+
+                <div class="full_column"></div>
+
+            </div>
+            
+            <div id="display-fields"></div>
+            <input  type="hidden" id="currentrowid" value="" />
+            <div class="full_column">
+                <button class="save" onclick="addToSession($('#display-type').val());">Save</button>
+                <button class="cancel" onclick="removePoup();">Cancel</button>
+                <button class="delete left" onclick="deleteControl()">Delete this control</button>
+            </div>
+        
+<script>
+            
+            $('#display-type').bind('change', function(){
+                
+               if($(this).val() == '' || $(this).val() == 'Button')
+               {
+                   $.get('<%=resource%>/form-button.html', function(data){
+                       $('#display-fields').html(data); 
+                   }); 
+               }
+               
+               
+               if( $(this).val() == 'Number')
+               {
+                   $.get('<%=resource%>/form-number.html', function(data){
+                       $('#display-fields').html(data); 
+                   }); 
+               }
+               
+               if( $(this).val() == 'Number (slider)')
+               {
+                   $.get('<%=resource%>/form-number-slider.html', function(data){
+                       $('#display-fields').html(data); 
+                   }); 
+               }
+               
+               
+               if( $(this).val() == 'Display')
+               {
+                   $.get('<%=resource%>/form-display.html', function(data){
+                       $('#display-fields').html(data); 
+                   }); 
+               }
+               
+               
+               if( $(this).val() == 'Display (webcam)')
+               {
+                   $.get('<%=resource%>/form-display-webcam.html', function(data){
+                       $('#display-fields').html(data); 
+                   }); 
+               }
+                
+               
+               
+            });
+                       
+        </script>
