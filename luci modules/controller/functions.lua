@@ -35,66 +35,10 @@ function index()
       popup_form.sysauth = false
 end
 
-function start_webcam()
-
-	 --os.execute(' mjpg_streamer -i "input_uvc.so -q 80 -f 24 -r 320x240" -o "output_http.so" ')
-	 --os.execute('^C')
-	 luci.template.render("robot/distance")
-	 
-end
-
-function setup_camera()
-        local device = "0"
-	local resolution = "320x240"
-	local fps = "10"
-	local quality = "80"
-	local port = "8080"
-        local mjpg = io.open("/etc/config/mjpg-streamer","w")
-        mjpg:write( "config mjpg-streamer 'core'"+"\n")
-	mjpg:write( "    option enable 'true''"+"\n")
-	mjpg:write( "    option input 'uvc''"+"\n")
-	mjpg:write( "    option output 'http''"+"\n")
-	mjpg:write( "    option device '/dev/video"+device+"''"+"\n")
-	mjpg:write( "    option resolution '"+resolution+"''"+"\n")
-	mjpg:write( "    option fps '"+fps+"''"+"\n")
-	mjpg:write( "    option quality '"+quality+"''"+"\n")
-	mjpg:write( "    option port '"+port+"''"+"\n")
-	mjpg:close()
-end 
-
-function heartbeat(direction)
-	--local python_serial = io.popen("python /usr/lib/lua/luci/controller/robot/serialcom.py "+direction,"r")
-	luci.http.prepare_content("application/json")
-        luci.http.write_json(python_serial)
-end
- 
-function file_open(name)
-   local f=io.open(name,"w")
-   if f~=nil then io.close(f) return nil else return f end
-end
-
-
 function action_move()
-
-	    if luci.http.formvalue("dir") == "forward" then
-		io.popen("echo '#mov(80)' > /home/command")
-	    elseif luci.http.formvalue("dir") == "back" then
-	        io.popen("echo '#mov(-80)' > /home/command")	
-	    elseif luci.http.formvalue("dir") == "left" then
-	        io.popen("echo '#mov(80,-90)' > /home/command")
-	    elseif luci.http.formvalue("dir") == "right" then
-	        io.popen("echo '#mov(80,90)' > /home/command")
-	    else 
-                io.popen("echo '#mov(0)' > /home/command")
-	    end
-	
+            os.execute("echo '"..luci.http.formvalue("com").."' > /tmp/command & sync")
+	    
 end
-
-function serial_test()
-	local test = "success"
-        --os.execute('python /usr/lib/lua/luci/controller/robot/testSerial.py')
-end
-
 function wifi_status()
         local wifi = io.popen("iw dev wlan0 station dump","r")
         luci.http.prepare_content("application/json")
@@ -113,7 +57,7 @@ end
 
 function action_read()
         data = {"0","0","0","0","0","0"}
-        local data_file = io.open('/home/data','r')
+        local data_file = io.open('/tmp/data','r')
         if data_file~=nil then
             raw_data = data_file:read()
             data = raw_data
@@ -122,7 +66,6 @@ function action_read()
         luci.http.prepare_content("application/json")
 
         luci.http.write_json(data)
-	--tcp:close()
 end
 
 function action_load()
@@ -135,14 +78,9 @@ function action_load()
         luci.http.write_json(code)
 end
 
-function magiclines(s)
-	if s:sub(-1)~="\n" then s=s.."\n" end
-        return s:gmatch("(.-)\n")
-end
-
 function action_save()
         local lines = luci.http.formvalue("lines")
-    
+       
         lines = tonumber(lines)
 	for i = 1, lines do
 		line = luci.http.formvalue(tostring(i))
@@ -152,7 +90,6 @@ function action_save()
 			os.execute("echo '"..line.."' >> '/home/user-script.py'")
 		end
 	end
-
 end	
 
 function action_run()
@@ -160,70 +97,5 @@ function action_run()
 end	
 
 function take_picture()
-	os.execute('wget -P /tmp/mounts/Disc-A1/ "http://localhost:8080/?action=snapshot"')
+	os.execute('wget "http://localhost:8080/?action=snapshot" -O /tmp/mounts/Disc-A1/pic_$(date +%S-%M-%H_%d-%m-%y).jpg')
 end	
-
-function action_write()
-        
-        local commandStr = luci.http.formvalue("command")
-        local commandServo = luci.http.formvalue("commandSer")
-        	
-        
-        wserial=io.open("/dev/ttyACM0","w")
-        
-       if string.len(commandServo) ~= 0 then
-        	local commandSer = {}
-        	seri = 0
-        	for serj in string.gmatch( commandServo, "(%d+),") do
-        		commandSer[seri] = serj
-        		seri = seri + 1
-        	end
-        	wserial:write(string.char(255,2,commandSer[0],commandSer[1],0,commandSer[2],commandSer[3],254))
-        	wserial:flush()
-        end
-        
-        if string.len(commandStr) ~= 0 then
-        
-        	if commandStr == "STOP" then
-        		for motNum=1,4 do
-        	
-        			wserial:write(string.char(255,1,motNum,0,0,0,0,254))	
-        	
-        		end
-        	
-        		wserial:flush()	
-        	
-        	else
-        	
-        		local command = {}
-        	
-       		
-       			inti =0
-        		for i in string.gmatch( commandStr, "(%d+,%d+,%d+,%d+,%d+,)'''") do
-        	
-        			tempStr = i
-        			intj =0
-        
-        			command[inti] = {}
-        			for j in string.gmatch( tempStr, "(%d+),") do
-        
-        				command[inti][intj] = j
-        				intj = intj+1
-        			end
-        
-       		 		inti = inti+ 1
-        		end
-        
-        		inti = inti-1
-        	
-        		for x=0,inti do 
-        	
-        			wserial:write(string.char(255,1,command[x][0],command[x][1],command[x][2],command[x][3],command[x][4],254))
-			end
-			wserial:flush()        
-		end
-	
-	end
-end
-
-
