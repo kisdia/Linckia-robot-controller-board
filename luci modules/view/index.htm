@@ -80,22 +80,26 @@ function read_analog(){
         XHR.poll(5, '<%=luci.dispatcher.build_url("admin","robot","distance","read")%>', null,
                  function(x, data)
                  {      
-                        var battery = (Number(data[5])*49/10000).toFixed(2);
-                        var percentage = 100;
-                        //document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(battery)+"V";
-                        if (battery<4.0){
-                            if (battery>3.1){
-                                percentage = Math.round((battery-3.1)*111);
-                            } else {
-                                percentage = 0;
-                            }
-                        }
-                        if (battery<2.7){
-                            document.getElementById('batteryTxt').innerHTML = "NOT CONNECTED";
-                        }
-                    document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(percentage)+"%";    
-		document.getElementById('batteryGauge').setAttribute("style" , "width: "+String(percentage)+"%;");
-                 }
+		    data = JSON.parse(data);
+		     if(data){
+			data = data.split(",");
+			var battery = (Number(data[5])*49/10000).toFixed(2);
+			var percentage = 100;
+			if (battery<4.0){
+				if (battery>3.1){
+					percentage = Math.round((battery-3.1)*111);
+				} else {
+					percentage = 0;
+				}
+			}
+			if (battery<2.7){
+				document.getElementById('batteryTxt').innerHTML = "NOT CONNECTED";
+			} else {
+				document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(percentage)+"%";
+			}   
+			document.getElementById('batteryGauge').setAttribute("style" , "width: "+String(percentage)+"%;");
+			}
+		}
         );
 
 }
@@ -235,7 +239,7 @@ function read_analog(){
         	<div class="row">
             	<div class="col span_4 rovermk">
                 	<h2>Rover MK1</h2>
-                    <p>Dashboard version v1.0.1</p>
+                    <p>Dashboard version v1.1.0</p>
                 </div>
                 
                 <div class="col span_4">

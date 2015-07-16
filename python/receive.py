@@ -22,7 +22,7 @@ while True:
 		
         #print data
 	if data<>data_old:
-		data_file = open('/home/data','w')
+		data_file = open('/tmp/data','w')
 		data_file.write(data[1:-1])
 		data_file.close()
 	

@@ -21,9 +21,9 @@ from serial.serialutil import SerialException
 
 def set(target,position, time = 0, duration = 0, delay = 0):
     target, position = int(target), int(position)
-    position100 = int(position/100)
-    position = position - position100
-    command =  chr(255)+ chr(2)+chr(target)+chr(position100)+chr(position)+chr(0)+ chr(0)+chr(254)
+    #position100 = int(position/100)
+    #position = position - position100
+    command =  chr(255)+ chr(2)+chr(target+1)+chr(position)+chr(0)+chr(0)+ chr(0)+chr(254)
     var.devices[0][2].write(command)
 
 def get(target, time = 0, duration = 0, delay = 0):
@@ -39,19 +39,9 @@ def get(target, time = 0, duration = 0, delay = 0):
         data = ""
         if var.devices[0][2].inWaiting()>5:
             data = var.devices[0][2].read(6)
-        #if var.devices[0][2].inWaiting()>0:
-        #    discard = var.devices[0][2].read(var.devices[0][2].inWaiting())
-        #print target,len(data)
         if len(data)>5:
-            #print ord(data[0]),ord(data[1]),ord(data[2]),ord(data[3]),ord(data[4]),ord(data[5])
-            #if len(data)>5:
-            #print ord(data[3]), ord(data[4])
             if ord(data[2])<6:
                 var.data[ord(data[2])] = ord(data[3])*100+ord(data[4])
-            #data = ord(data[3])*100+ord(data[4])
-        #else:
-            #data = 0
-        #var.data[target] = data
     while var.devices[0][2].inWaiting()>5:
         data = var.devices[0][2].read(6)
         if ord(data[2])<6:

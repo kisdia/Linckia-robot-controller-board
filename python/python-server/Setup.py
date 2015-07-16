@@ -31,7 +31,8 @@ def setup():
 def initialise_devices():
     "Initialise devices"
     #USB or serial devices setup
-    var.devices.append(['Arduino', '/dev/ttyACM0'])
+    var.devices = []
+    var.devices.append(['Arduino', '/dev/ttyACM'+str(var.serial_start)])
     var.number_of_devices = len(var.devices)
 
 
@@ -46,7 +47,7 @@ def serial_setup():
                             parity = 'N',
                             rtscts = False,
                             xonxoff = False,
-                            timeout = 0,
+                            timeout = 0.5,
                         )
         #new_device.open()
         device.append(new_device)

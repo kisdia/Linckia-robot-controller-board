@@ -44,22 +44,49 @@
 
 var imageN=1;
 var data = ["0","0","0","0","0","0"];
-var command = "None";
-var dir = "None";
-var dir_old = "None";
+var commands = [];
+var servos = [0,0,0];
+var dir = "none";
+var dir_old = "none";
 var ip = location.host;
 var wifi_percentage = 100;
+var connection = new WebSocket('ws://'+ip+':2000');
+connection.onopen = function(evt){sendCommand()};
+var has_ws=0;
+var movetime = 10;
+var counter = movetime;
 
 function onload(){
-       //var update = setInterval(imageUpdate,500);
-       //var xmlhttp = new XMLHttpRequest();
-       //xmlhttp.open("POST","<%=controller%>/admin/robot/distance/serial",true);
-       //xmlhttp.send();
        read_wifi();
-       // read_analog();
+       testWebSocket();
        imageUpdate();
        sendCommand();
        receiveData();
+}
+
+//function onclose(){
+//	connection.onclose = function(){};
+//	connection.close()
+//}
+//
+//window.onbeforeunload = onclose();
+
+function testWebSocket() {
+    if ("WebSocket" in window) {
+        has_ws=1;
+    }
+    else {
+        alert("Your browser does not support WebSocket Technology. \\n  Sending commands will have ~1second delay");
+    }
+}
+
+
+function connectWebSocket(){
+  try{
+    connection = new WebSocket('ws://'+ip+':2000');
+  }catch(e){ //throws code 15 if has socket to me babies
+    has_ws=1;
+  }
 }
 
 function imageUpdate(){
@@ -69,50 +96,110 @@ function imageUpdate(){
            webcam.src = "<%=resource%>/images/cam.png";
     };
     setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
+}
+
+function countdown(){
+    if (counter == 0){
+	counter = movetime;
+	move("none");
+    }
+    else {
+	counter = counter -1;
+	document.getElementById("status").innerHTML = "Moving " + dir +" "+ String(counter) ;
+	setTimeout(countdown,1000);
+    }
 } 
 
+function queueCommand(command){
+	if (command!=commands[commands.length-1]){
+		commands.push(command);
+	}
+}
+
 function move(direction){
+	if(dir==direction){
+		direction = 'none';
+	}
 	dir = direction;
-	//var xmlhttp=new XMLHttpRequest();
-	//xmlhttp.open("POST","<%=controller%>/admin/robot/distance/move",true);
-	//xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	//xmlhttp.send("dir=" + direction);
+	if (dir=="none"){
+		//commands.push("#mov(0)");
+		queueCommand("#mov(0)");
+	} else if (dir=="forward"){
+		commands.push("#mov(80)");
+		countdown();
+	} else if (dir=="back"){
+		commands.push("#mov(-80)");
+		countdown();
+	} else if (dir=="left"){
+		commands.push("#mov(80,-90)");
+		countdown();
+	} else if (dir=="right"){
+		commands.push("#mov(80,90)");
+		countdown();
+	} else {
+		queueCommand("#mov(0)");
+		//commands.push("#mov(0)");
+	}
 	document.getElementById("status").innerHTML = "Moving " + direction;
 	if (direction == "none"){
 		document.getElementById("status").innerHTML = "Stopped";
         }
 }
 
+function servo(target){
+        //alert("#set("+target+","+servos[target]+")");
+	commands.push("#set("+target+","+servos[target]+")");
+}
+
+function servoup(target){
+	if (servos[target]<180){
+	    servos[target] = servos[target]+5;
+	    servo(target);
+	}
+}
+
+function servodown(target){
+	if (servos[target]>0){
+	    servos[target] = servos[target]-5;
+	    servo(target);
+	}
+}
+
 function sendCommand(){
-        if (dir!=dir_old){
-            dir_old = dir;
-	    //send
-	    var xmlhttp=new XMLHttpRequest();
-	    xmlhttp.open("POST","<%=controller%>/admin/robot/distance/move",true);
-	    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	    xmlhttp.send("dir=" + dir);
+        if (commands.length>0){
+	     //send
+	     if(has_ws==1){
+		connection.send(commands[0]);
+	     }
+	     else{
+		$.post("<%=controller%>/admin/robot/distance/move","com="+commands[0]);
+	     }
+	     commands.shift();
         }
-        setTimeout(sendCommand,200+(100-wifi_percentage)*20);
+        setTimeout(sendCommand,50+(100-wifi_percentage)*40);
 }
 
 function receiveData(){
 
 	//read
+	$.post("<%=controller%>/admin/robot/distance/read",function(data){});
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.open("GET","<%=controller%>/admin/robot/distance/read",true);
 	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 	xmlhttp.onreadystatechange=function(){
 		if (xmlhttp.readyState==4 && xmlhttp.status==200){
 			var data = xmlhttp.responseText;
-			data = JSON.parse(data);
+                        data = JSON.parse(data);
+			data = data.toString();
 			if(data){
-				data = data.split(",");
-				battery_status(data);
+                        	data = data.split(",");
+                        	battery_status(data);
 			}
 		}
 	}
 
-	xmlhttp.send();
+	//xmlhttp.send();
+
         setTimeout(receiveData,2000);
 	
 }
@@ -163,9 +250,6 @@ function battery_status(data){
 
 }
 
-
-
-
 function record_video(){
         alert("Recording videos isn't implemented yet!");
 }
@@ -182,7 +266,7 @@ function take_picture(){
 
 </head>
 
-<body onload="onload()" onmouseup="move('none')">
+<body onload="onload()">
 
 <!--Header start-->
 <header class="topheader">
@@ -332,9 +416,9 @@ function take_picture(){
             	<div class="col span_4-5 sep-left right">
                 	<h4>main Controls</h4>
                     <div class="maincontrols">
-                    <span class="shadow" id="status">Stopped</span>
-                    <a class="arrow up text_center" onmousedown="move('forward')" onmouseup="move('none')"></a><br>
-                    <a class="rotate left" onmousedown="move('left')" onmouseup="move('none')"></a> <a class="arrow down" onmousedown="move('back')" onmouseup="move('none')"></a> <a class="rotate right" onmousedown="move('right')" onmouseup="move('none')"></a>
+                    <span class="shadow" id="status" onmousedown="move('none')">Stopped</span>
+                    <a class="arrow up text_center" onmousedown="move('forward')"></a><br>
+                    <a class="rotate left" onmousedown="move('left')"></a> <a class="arrow down" onmousedown="move('back')"></a> <a class="rotate right" onmousedown="move('right')"></a>
                     <div class="clear"></div>
                     </div>
                 </div>
@@ -369,15 +453,16 @@ function take_picture(){
                 <div class="col span_4-5 sep-right left">
                 	<h4>Arm Attachment</h4>
                     <div class="arm_attachmemt">
-                    	<div><a class="arrow up"></a> <span class="text_center">Shoulder</span> <a class="arrow down"></a> 
+                    	<div><a class="arrow up" onclick="servoup(0)"></a> <span class="text_center">Shoulder</span> <a class="arrow down" onclick="servodown(0)"></a> 
+
                         	<div class="clear"></div>
                         </div>
                         
-                        <div><a class="arrow up"></a> <span class="text_center">Elbow</span> <a class="arrow down"></a> 
+                        <div><a class="arrow up" onclick="servoup(1)"></a> <span class="text_center">Elbow</span> <a class="arrow down" onclick="servodown(1)"></a> 
                         	<div class="clear"></div>
                         </div>
                         
-                        <div><a class="blank open">OPEN</a> <span class="text_center">Open/Close</span> <a class="blank close">Close</a> 
+                        <div><a class="blank open" onclick="servoup(2)">OPEN</a> <span class="text_center">Open/Close</span> <a class="blank close" onclick="servodown(2)">Close</a> 
                         	<div class="clear"></div>
                         </div>
                     </div>

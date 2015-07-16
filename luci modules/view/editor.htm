@@ -51,8 +51,8 @@
 			
 function onload(){
         read_wifi();
-        //read_analog();
-        //load();
+        read_analog();
+        load();
 }
 
 function read_wifi(){
@@ -85,22 +85,26 @@ function read_analog(){
         XHR.poll(5, '<%=luci.dispatcher.build_url("admin","robot","distance","read")%>', null,
                  function(x, data)
                  {      
-                        var battery = (Number(data[5])*49/10000).toFixed(2);
-                        var percentage = 100;
-                        //document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(battery)+"V";
-                        if (battery<4.0){
-                            if (battery>3.1){
-                                percentage = Math.round((battery-3.1)*111);
-                            } else {
-                                percentage = 0;
-                            }
-                        }
-                        if (battery<2.7){
-                            document.getElementById('batteryTxt').innerHTML = "NOT CONNECTED";
-                        }
-                    document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(percentage)+"%";    
-		document.getElementById('batteryGauge').setAttribute("style" , "width: "+String(percentage)+"%;");
-                 }
+		    data = JSON.parse(data);
+		     if(data){
+			data = data.split(",");
+			var battery = (Number(data[5])*49/10000).toFixed(2);
+			var percentage = 100;
+			if (battery<4.0){
+				if (battery>3.1){
+					percentage = Math.round((battery-3.1)*111);
+				} else {
+					percentage = 0;
+				}
+			}
+			if (battery<2.7){
+				document.getElementById('batteryTxt').innerHTML = "NOT CONNECTED";
+			} else {
+				document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(percentage)+"%";
+			}   
+			document.getElementById('batteryGauge').setAttribute("style" , "width: "+String(percentage)+"%;");
+			}
+		}
         );
 
 }
@@ -110,29 +114,13 @@ function save(){
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.open("POST","<%=controller%>/admin/robot/editor/save",true);
 	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	//xmlhttp.send("line=first");
 	var lines = code.split('\n');
-        //alert(lines);
-        //alert(lines.length.toString());
         var first = [lines.length.toString()];
-        //alert(first);
 	var data = first.concat(lines);
-        //alert(data);
-	//alert(data.length)
-	//xmlhttp.send("lines="+String(lines.length));
-	//for(var i=0;i < lines.length;i++){
-        //        xmlhttp= new XMLHttpRequest();
-	//	xmlhttp.open("POST","<%=controller%>/admin/robot/editor/save",true);
-        //        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        //        var line = encodeURIComponent(lines[i]);
-        //	xmlhttp.send("line="+line);
-	//}
 	var tosend = "lines="+data[0]
         for(var i=1;i < data.length;i++){
-	//	alert(data[i]);
 		tosend = tosend+"&"+i.toString()+"="+encodeURIComponent(data[i]);
         }
-        //alert(tosend);
         xmlhttp.send(tosend);
         alert("Your code have been saved in: /home/user-script.py");
 }
@@ -369,8 +357,20 @@ function load(){
 <pre id="editor">
 import robot #adds custom functions you can use to drive the robot
 
-robot.move('forward') #move forward
+robot.move("forward") #move forward
 robot.delay(2) #do previous command for 2 seconds
+robot.stop() #stop
+robot.delay(1)
+robot.move("left")
+robot.delay(2)
+robot.stop() #stop
+robot.delay(1)
+robot.move("right")
+robot.delay(2)
+robot.stop() #stop
+robot.delay(1)
+robot.move("back")
+robot.delay(2)
 robot.stop() #stop
 </pre>
 </div>

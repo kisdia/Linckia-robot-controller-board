@@ -22,6 +22,7 @@ on = False
 soc = None
 port = 2000
 
+websocket = False
 ###DEVICES
 
 #devices

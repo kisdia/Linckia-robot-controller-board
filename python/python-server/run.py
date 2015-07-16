@@ -23,17 +23,17 @@ DELTA = FREQ_LIMIT  # done so first error doesn't count towards limit
 
 while DELTA >= FREQ_LIMIT:
     try:
-        Setup.setup()
         try:
+            Setup.setup()
             Setup.serial_setup()
-        except SerialException:
-            print "serial error"
+        except StandardError:
+            print "serial setup error"
             time.sleep(2)
             if var.serial_start == 0:
-                var.serial_start = 2
-            elif var.serial_start ==2:
+                var.serial_start = 1
+            elif var.serial_start ==1:
                 var.serial_start = 0
-            Setup.closedown()
+            Setup.setup()
             Setup.serial_setup()
         SCHED = Scheduler()
         SCHED.new(server(var.port))
@@ -50,8 +50,5 @@ while DELTA >= FREQ_LIMIT:
         
         if var.soc:
             var.soc.close()  # close socket so it's free to reconnect on restart
-        
-        Setup.closedown()
-               
         START = time.time()
 

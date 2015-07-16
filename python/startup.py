@@ -23,4 +23,6 @@ else:
     pass
     
 
+os.system("echo '#mov(0)' > /tmp/command")
 
+os.system("echo '0,0,0,0,0,0' > /tmp/data")
