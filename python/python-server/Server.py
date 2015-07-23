@@ -46,59 +46,46 @@ def handle_client(client, addr):
         command = yield client.recv(1024) #receives one megabyte
         if not command:
             break
-        #command = command.rstrip() #remove line break characters
-        #commands = re.findall(var.command_re,command, re.MULTILINE)
-        #print "COMMAND RECEIVED \n" , command
         if var.websocket == True:
             command = decodeCharArray(command)
-            commands = var.command_pattern_gen.findall(command)
-            #callFunction(commands)
-            for command in commands:
-                function_call = command[0]
-                args = var.command_pattern_arg.findall(command[1])
-                try:
-                    methodToCall = getattr(f,function_call)
-                    methodToCall(*args)
-		    #print function_call, args
-                except AttributeError:
-                    print "unknown command function"
+            command_to_function(command)
             	
 	if var.websocket == False:
-            key = (re.search('Sec-WebSocket-Key:\s+(.*?)[\n\r]+', command)
-                    .groups()[0]
-                    .strip())
-            if key:
-                #print "key"
-                response_key = b64encode(sha1(key + GUID).digest())
-                response = '\r\n'.join(websocket_answer).format(key=response_key)
-                print response
-                yield client.send(response)
-                var.websocket = True
+            if "WebSocket" in command:
+                try:
+                    key = (re.search('Sec-WebSocket-Key:\s+(.*?)[\n\r]+', command)
+                        .groups()[0]
+                        .strip())
+                    response_key = b64encode(sha1(key + GUID).digest())
+                    response = '\r\n'.join(websocket_answer).format(key=response_key)
+                    yield client.send(response)
+                    var.websocket = True
+                except AttributeError:
+                    print "wrong websocket initialisation"
             else:
-                commands = var.command_pattern_gen.findall(command)
-                callFunction(commands)
+                command_to_function(command)
         	
     #var.websocket = False
     yield client.close()
     print "client closed"
 
-def callFunction(commands):
-    print commands
+def command_to_function(command):
+    commands = var.command_pattern_gen.findall(command)
     for command in commands:
         function_call = command[0]
         args = var.command_pattern_arg.findall(command[1])
-        print "calling", function_call, args
+        #print "calling", function_call, args
         try:
             methodToCall = getattr(f,function_call)
             methodToCall(*args)
         except AttributeError:
             print "unknown command function"
-        if "get" in function_call:
-            if var.data:
-                #print var.data
-                #if var.data<>var.data_old:
-                yield client.send(str(var.data))
-                #var.data_old=var.data
+        #if "get" in function_call:
+        #    if var.data:
+        #        #print var.data
+        #        #if var.data<>var.data_old:
+        #        yield client.send(str(var.data))
+        #        #var.data_old=var.data
 
 def decodeCharArray(stringStreamIn):
     

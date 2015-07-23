@@ -55,7 +55,6 @@ connection.onopen = function(evt){sendCommand()};
 var has_ws=0;
 var movetime = 10;
 var counter = movetime;
-var webcam_test = "true";
 
 function onload(){
        read_wifi();
@@ -95,14 +94,8 @@ function imageUpdate(){
     webcam.src = "http://"+ip+":8080/?action=snapshot&n="+ (++imageN);
     webcam.onerror = function(){
            webcam.src = "<%=resource%>/images/cam.png";
-	webcam_test = "false";
     };
-    if(webcam_test=="true"){
-	setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
-    }
-    else{
-	etTimeout(imageUpdate,20000);
-    }
+    setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
 }
 
 function countdown(){
@@ -127,25 +120,30 @@ function move(direction){
 	if(dir==direction){
 		direction = "none";
 	}
+        else if(dir!="none"){
+                counter=movetime;
+        }
 	dir = direction;
 	if (dir=="none"){
+		//commands.push("#mov(0)");
 		queueCommand("#mov(0)");
 		counter=movetime;
 	} else if (dir=="forward"){
-		queueCommand("#mov(80)");
+		commands.push("#mov(80)");
 		countdown();
 	} else if (dir=="back"){
-		queueCommand("#mov(-80)");
+		commands.push("#mov(-80)");
 		countdown();
 	} else if (dir=="left"){
-		queueCommand("#mov(80,-90)");
+		commands.push("#mov(80,-90)");
 		countdown();
 	} else if (dir=="right"){
-		queueCommand("#mov(80,90)");
+		commands.push("#mov(80,90)");
 		countdown();
 	} else {
 		queueCommand("#mov(0)");
 		counter=movetime;
+		//commands.push("#mov(0)");
 	}
 	document.getElementById("status").innerHTML = "Moving " + direction;
 	if (direction == "none"){

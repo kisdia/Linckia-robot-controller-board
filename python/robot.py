@@ -8,9 +8,9 @@ def move(direction, speed = 80):
 	elif direction == "back":
 		send("#mov("+str(-speed)+")\n")
 	elif direction == "left":
-		send("#mov("+str(speed)+", -90)\n")
+		send("#mov("+str(speed)+",-90)\n")
 	elif direction == "right":
-		send("#mov("+str(speed)+", 90)\n")
+		send("#mov("+str(speed)+",90)\n")
 	else:
 		send("#mov(0)\n")
 
