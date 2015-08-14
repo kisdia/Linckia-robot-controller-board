@@ -1,5 +1,3 @@
-
-
 /*
  * ------------------------------
  *  Asteroidea version 4.2
@@ -12,15 +10,15 @@
  */
 
 // Import the Arduino Servo library
-#include <SoftwareServo.h>
 #include <Metro.h>
-#include <Wire.h>
+#include <Servo.h>
+#include <SoftPWM.h>
 
 ////// Create a Servo object for each PWM servo out
 ////~~~~~~~~~~Wheels~~~~~~~~~~//
-SoftwareServo servo1; //Digital pin 3
-SoftwareServo servo2; //Digital pin 11
-SoftwareServo servo3; //Digital pin 6
+Servo servo1; //Digital pin 3
+Servo servo2; //Digital pin 11
+Servo servo3; //Digital pin 6
 int motor1ph = 4; //motor 1 phase Digital pin 4
 int motor1en = 9; //motor 1 enable Digital pin 9 PWM
 int motor2ph = 12; //motor 2 phase Digital pin 12
@@ -31,9 +29,9 @@ int motor4ph = 7; //motor 4 phase Digital pin 7
 int motor4en = 13; //motor 4 enable Digital pin 13 PWM
 
 // Common servo setup values
-int minPulse = 544;   // minimum servo position, us microseconds
-int startPulse = 1472;  //startup positions (middle/stop), degrees
-int maxPulse = 2400;  // maximum servo position, us microseconds
+int minPulse = 1000;   // minimum servo position, us microseconds
+int startPulse = 1500;  //startup positions (middle/stop), degrees
+int maxPulse = 2000;  // maximum servo position, us microseconds
 
 // User commands over serial
 int command[6];                        // raw input from serial buffer, 6 bytes
@@ -45,7 +43,7 @@ int stopbyte;                          // end of command
 int servo;                                                // target servo variable
 int pos;                                                  // servo position
 int servos[3] = {0,0,0};       //current postition of servos
-int servotargets[3] = {0,0,0}; //target position of servos
+int servotargets[3] = {90,90,0}; //target position of servos
 int servomovtimes[3] = {0,0,0};                           //time remaining to get to target position
 float servospeed;                                         //temporary value for servo speed calculation
 
@@ -61,7 +59,7 @@ int motormovtimes[4] = {0,0,0,0};  //time remaining to get to target speed
 float motorspeed;                  //temporary value of motor speed calucaltion
 
 //Iterators and time
-int time;                 //timed command value
+int movtime;                 //timed command value
 int i;                    // iterator command error check
 int j = 0;                // iterator (get feedback)
 int k;                    // iterator move joint
@@ -73,7 +71,7 @@ int feedback100;          // variable for storing 100s decimal places of feedbac
 int analogpin;            // variable for setting which analog pin to read
 
 //Metro objects for schedueled tasks
-int moveint = 50;
+int moveint = 100;
 int mfeedon = 0;
 int mfeedint = 1000;
 Metro MMove = Metro(moveint);
@@ -82,25 +80,18 @@ Metro motorfeedback = Metro(mfeedint);
 //USER DEFINED FUNCTIONS
 void PinSetup(){
   
-  servo1.attach(3); //attach servo 1 pwm to Digital pin 3
-  servo2.attach(11); //attach servo 2 pwm to Digital pin 11
-  servo3.attach(6); //attach servo 3 pwm to Digital pin 6
-  
-  servo1.setMinimumPulse(minPulse); //sets the minimum pulse duration 0 degrees in microseconds (default 544)
-  servo1.setMaximumPulse(maxPulse); //sets the maximum pulse duration 180 degrees in microseconds (default 2400)
-  servo2.setMinimumPulse(minPulse); //sets the minimum pulse duration 0 degrees in microseconds (default 544)
-  servo2.setMaximumPulse(maxPulse); //sets the maximum pulse duration 180 degrees in microseconds (default 2400)
-  servo3.setMinimumPulse(minPulse); //sets the minimum pulse duration 0 degrees in microseconds (default 544)
-  servo3.setMaximumPulse(maxPulse); //sets the maximum pulse duration 180 degrees in microseconds (default 2400)
-  
+  servo1.attach(3, minPulse, maxPulse); //attach servo 1 pwm to Digital pin 3
+  servo2.attach(11, minPulse, maxPulse); //attach servo 2 pwm to Digital pin 11
+  servo3.attach(6, minPulse, maxPulse); //attach servo 3 pwm to Digital pin 6
+
   pinMode(motor1ph,OUTPUT);
-  pinMode(motor1en,OUTPUT);
+  SoftPWMSet(motor1en,0);
   pinMode(motor2ph,OUTPUT);
-  pinMode(motor2en,OUTPUT);
+  SoftPWMSet(motor2en,0);
   pinMode(motor3ph,OUTPUT);
-  pinMode(motor3en,OUTPUT);
+  SoftPWMSet(motor3en,0);
   pinMode(motor4ph,OUTPUT);
-  pinMode(motor4en,OUTPUT);
+  SoftPWMSet(motor4en,0);
   pinMode(A0, INPUT);
   pinMode(A1, INPUT);
   pinMode(A2, INPUT);
@@ -113,6 +104,9 @@ void PinSetup(){
   digitalWrite(A3, LOW);
   digitalWrite(A4, LOW);
   digitalWrite(A5, LOW);
+  
+  pinMode(2,OUTPUT);
+  digitalWrite(2, HIGH);
 }
 
 void MoveServo(int servo, int pos){
@@ -136,46 +130,54 @@ void MoveMotor(int motor, int motordir, int pwm){
     case 1:
       if (motordir == 0){
         digitalWrite(motor1ph,LOW);   //set motor direction
-        analogWrite(motor1en,pwm);           //set motor speed
+        SoftPWMSetPolarity(motor1en,SOFTPWM_NORMAL);
+        //SoftPWMSetPercent(motor1en,pwm);           //set motor speed
       }
       if (motordir == 1){
         digitalWrite(motor1ph,HIGH);   //set motor direction
-        analogWrite(motor1en,255-pwm);           //set motor speed
+        SoftPWMSetPolarity(motor1en,SOFTPWM_INVERTED);
+        //SoftPWMSetPercent(motor1en,100-pwm);           //set motor speed
       }
-      //analogWrite(motor1en,pwm);           //set motor speed
+      SoftPWMSetPercent(motor1en,pwm);
       break;
     case 2:
       if (motordir == 0){
         digitalWrite(motor2ph,LOW);   //set motor direction
-        analogWrite(motor2en,pwm);           //set motor speed
+        SoftPWMSetPolarity(motor2en,SOFTPWM_NORMAL);
+        //SoftPWMSetPercent(motor2en,pwm);           //set motor speed
       }
       if (motordir == 1){
         digitalWrite(motor2ph,HIGH);   //set motor direction
-        analogWrite(motor2en,255-pwm);           //set motor speed
+        SoftPWMSetPolarity(motor2en,SOFTPWM_INVERTED);
+        //SoftPWMSetPercent(motor2en,100-pwm);           //set motor speed
       }
-      //analogWrite(motor2en,pwm);           //set motor speed
+      SoftPWMSetPercent(motor2en,pwm);
       break;
     case 3:
       if (motordir == 0){
-        digitalWrite(motor3ph,LOW);   //set motor direction
-        analogWrite(motor3en,pwm);           //set motor speed
+        digitalWrite(motor3ph,LOW);   //set motor direction 
+        SoftPWMSetPolarity(motor3en,SOFTPWM_NORMAL);
+        //SoftPWMSetPercent(motor3en,pwm);           //set motor speed
       }
       if (motordir == 1){
         digitalWrite(motor3ph,HIGH);   //set motor direction
-        analogWrite(motor3en,255-pwm);           //set motor speed
+        SoftPWMSetPolarity(motor3en,SOFTPWM_INVERTED);
+        //SoftPWMSetPercent(motor3en,100-pwm);           //set motor speed
       }
-      //analogWrite(motor3en,pwm);           //set motor speed
+      SoftPWMSetPercent(motor3en,pwm);
       break;
     case 4:
       if (motordir == 0){
         digitalWrite(motor4ph,LOW);   //set motor direction
-        analogWrite(motor4en,pwm);           //set motor speed
+        SoftPWMSetPolarity(motor4en,SOFTPWM_NORMAL);
+        //SoftPWMSetPercent(motor4en,pwm);           //set motor speed
       }
       if (motordir == 1){
         digitalWrite(motor4ph,HIGH);   //set motor direction
-        analogWrite(motor4en,255-pwm);           //set motor speed
+        SoftPWMSetPolarity(motor4en,SOFTPWM_INVERTED);
+        //SoftPWMSetPercent(motor4en,100-pwm);           //set motor speed
       }
-      //analogWrite(motor4en,pwm);           //set motor speed
+      SoftPWMSetPercent(motor4en,pwm);
       break;
   }
 }
@@ -204,22 +206,27 @@ void CommandReceived(int command[6]){
       if (command[0] == 1){ 
         motor = command[1]; // 1-4
         motordir = command[2]; //0 or 1
-        pwm = command[3]+255*motordir; // 0-510
-        time = ((command[4])*1000)+((command[5])*10); //milliseconds ??? WARNING THIS CAN BE HIGHER THAN 32767!rollover?
+        if (motordir == 1){
+          pwm = -command[3]; //-100 to 0
+        }
+        if (motordir == 0){
+          pwm = command[3]; // 0 to 100
+        }
+        movtime = ((command[4])*1000)+((command[5])*10); //milliseconds ??? WARNING THIS CAN BE HIGHER THAN 32767!rollover?
         
         motorsdir[motor-1] = motordir;
         motortargets[motor-1] = pwm;
-        motormovtimes[motor-1] = time;
+        motormovtimes[motor-1] = movtime;
         //Return(103,motor,motordir,pwm);
       } 
       //SERVO COMMAND
       if (command[0] == 2){
         servo = command[1]; // 1-3
         pos = command[2]; // 0-180
-        time = ((command[4])*1000)+((command[5])*10); //milliseconds ??? WARNING THIS CAN BE HIGHER THAN 32767!rollover?
+        movtime = ((command[4])*1000)+((command[5])*10); //milliseconds ??? WARNING THIS CAN BE HIGHER THAN 32767!rollover?
         
         servotargets[servo-1] = pos;
-        servomovtimes[servo-1] = time;
+        servomovtimes[servo-1] = movtime;
       } 
       //SENSOR direct command
       if (command[0] == 3){
@@ -246,7 +253,6 @@ void CommandReceived(int command[6]){
 
 void MoveActuators(){
   //Moves actuator by a calculated increment every 10 milliseconds
-  SoftwareServo::refresh(); //sync servos
   if (MMove.check() == 1){
     //servos
     k = 0;
@@ -273,21 +279,21 @@ void MoveActuators(){
       if (motors[k] != motortargets[k]){//if motor is not at new command target
         if (motormovtimes[k] < moveint){//if command time is less than 100 milisecond
           motors[k] = motortargets[k];
-          power = motors[k]-255*motorsdir[k];
+          power = abs(motors[k]);
           MoveMotor(k+1,motorsdir[k],power); // move motor immediatly
           motormovtimes[k] = 0;
         } //end of if time is less than moveint milisecond
         else{//else if time > moveint milisecond
           motorspeed = ((float)(motortargets[k] - motors[k])*moveint)/motormovtimes[k]; //calculated motor speed pwmchange/100ms
           motors[k] = motors[k]+ (int) (motorspeed); // update motor matrix
-          power = motors[k]-255*motorsdir[k];
-          if (motors[k] <255){
-            MoveMotor(k+1,0,power);
+          power = abs(motors[k]);
+          if (motors[k] <0){
+            motorsdir[k]=1;
           }
           else{
-            MoveMotor(k+1,1,power); 
-          }      
-          //MoveMotor(k+1,motorsdir[k],power); // move motor at calculted speed for 10ms
+            motorsdir[k]=0;
+          }
+          MoveMotor(k+1,motorsdir[k],power); // move motor at calculted speed for 10ms
           motormovtimes[k] = motormovtimes[k]-moveint;
         } // End of incremental move of servo
       } //End of if adjusment is required
@@ -315,19 +321,8 @@ void Return(int ID, int value, int value1, int value2){
   Serial.write(value2);
   Serial.write(254);
 }
-  
-//ARDUINO SETUP and LOOP functions
 
-void setup() { 
-   PinSetup();  //set up I/O
-   // Open the serial connection, baud 9600 (max: 115200)
-   Serial.begin(9600);
-//   pinMode(ledPin, OUTPUT);
-//   digitalWrite(ledPin, HIGH);
-} 
-
-void loop() 
-{ 
+void ReadSerial(){
   // Check serial input (min 8 bytes in buffer)
    if (Serial.available() > 7){
      // Read the first byte
@@ -353,14 +348,26 @@ void loop()
        //Error wrong Startbyte
        Return(101,startbyte,0,0);
      } //end of reject startbyte
-  } //end if serial.available
+  } //end if serial.available 
+}
   
-   //Do scheduled tasks
-   //move things   
-   MoveActuators();
-   //CheckSensors
-   //CheckSensors();
-   //SoftwareServo::refresh(); //sync servos
+//ARDUINO SETUP and LOOP functions
+
+void setup() { 
+   PinSetup();  //set up I/O
+   // Open the serial connection, baud 9600 (max: 115200)
+   Serial.begin(9600);
+   SoftPWMBegin();
+   SoftPWMSetFadeTime(motor1en, 1000, 1000);
+   SoftPWMSetFadeTime(motor2en, 1000, 1000);
+   SoftPWMSetFadeTime(motor3en, 1000, 1000);
+   SoftPWMSetFadeTime(motor4en, 1000, 1000);
+} 
+
+void loop() 
+{ 
+  ReadSerial();
+  MoveActuators();
   
 }
   
