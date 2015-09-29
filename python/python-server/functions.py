@@ -71,7 +71,8 @@ def mov(power,turn=0,time = 0, duration = 0, delay = 0):
         set(0, 45-turn)
         set(1, 45+turn)
         #set(2, 45-turn)
-        t.sleep(4)
+        if var.turn <> 0:
+            t.sleep(3)
     right = x+ y
     left = x - y
     direction = 0
