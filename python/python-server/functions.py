@@ -6,7 +6,7 @@
 #direct commands which makes control and AI code
 #much more human readable
 
-import time
+import time as t
 import var
 import logging
 import socket
@@ -48,11 +48,30 @@ def get(target, time = 0, duration = 0, delay = 0):
             var.data[ord(data[2])]= ord(data[3])*100+ord(data[4])
     if var.devices[0][2].inWaiting()>0:
         discard = var.devices[0][2].read(var.devices[0][2].inWaiting())
+
+def wheel(wheel_id, speed, accel_duration=0):
+    direction = 0
+    if speed<0:
+        direction=1
+    command = chr(255)+chr(1)+chr(wheel_id)+chr(direction)+chr(abs(speed))+chr(accel_duration)+chr(0)+chr(254)
+    var.devices[0][2].write(command)
     
 def mov(power,turn=0,time = 0, duration = 0, delay = 0):
-    power, turn = int(power), int(turn)
-    x = math.cos(math.radians(turn))*power*var.motors[0]/50 #% calibration doubled 100=> is 200% number between 0-200
-    y = math.sin(math.radians(turn))*power*var.motors[3]/50
+    power, turn, time, duration, delay = int(power), int(turn), int(time), int(duration), int(delay)
+    x = math.cos(math.radians(turn))*power
+    y = math.sin(math.radians(turn))*power
+    if abs(turn)==90:
+        var.turn = 90
+	set(0,170)
+        set(1,170)
+        #set(2,170)
+	t.sleep(4)
+    elif turn<>var.turn:
+        var.turn = turn
+        set(0, 45-turn)
+        set(1, 45+turn)
+        #set(2, 45-turn)
+        t.sleep(4)
     right = x+ y
     left = x - y
     direction = 0
@@ -60,12 +79,12 @@ def mov(power,turn=0,time = 0, duration = 0, delay = 0):
         direction = 1
         right = abs(right)
     commandRight1 = chr(255)+chr(1)+chr(1)+chr(direction)+chr(int(round(right)))+chr(duration)+chr(0)+chr(254)
-    commandRight2 = chr(255)+chr(1)+chr(2)+chr(direction)+chr(int(round(right)))+chr(duration)+chr(0)+chr(254)
+    commandRight2 = chr(255)+chr(1)+chr(3)+chr(direction)+chr(int(round(right)))+chr(duration)+chr(0)+chr(254)
     direction = 0
     if left <0:
-        direction =1
+        direction = 1
         left = abs(left)
-    commandLeft1 = chr(255)+chr(1)+chr(3)+chr(direction)+chr(int(round(left)))+chr(duration)+chr(0)+chr(254)
+    commandLeft1 = chr(255)+chr(1)+chr(2)+chr(direction)+chr(int(round(left)))+chr(duration)+chr(0)+chr(254)
     commandLeft2 = chr(255)+chr(1)+chr(4)+chr(direction)+chr(int(round(left)))+chr(duration)+chr(0)+chr(254)
     var.devices[0][2].write(commandRight1)
     var.devices[0][2].write(commandRight2)

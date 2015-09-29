@@ -56,3 +56,7 @@ data = [0,0,0,0,0,0]
 data_old = [0,0,0,0,0,0]
 start_feedback = [2,1,1,0,10,0] #turn on motor feedback interval of 1000 millisec
 lost_data = None
+
+#driving
+turn=0
+angles = [0,0,0]

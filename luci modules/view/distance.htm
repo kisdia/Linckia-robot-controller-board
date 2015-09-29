@@ -55,6 +55,11 @@ connection.onopen = function(evt){sendCommand()};
 var has_ws=0;
 var movetime = 10;
 var counter = movetime;
+var speed = "50";
+var heading = "0";
+var turn = "0";
+var accel_time = "1";
+var middpoint = [45,45,45];
 
 function onload(){
        read_wifi();
@@ -95,7 +100,7 @@ function imageUpdate(){
     webcam.onerror = function(){
            webcam.src = "<%=resource%>/images/cam.png";
     };
-    setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
+    //setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
 }
 
 function countdown(){
@@ -126,33 +131,76 @@ function move(direction){
 	dir = direction;
 	if (dir=="none"){
 		//commands.push("#mov(0)");
-		queueCommand("#mov(0)");
+		queueCommand("#mov(0,0,0,"+accel_time+")");
 		counter=movetime;
 	} else if (dir=="forward"){
-		commands.push("#mov(80)");
+		commands.push("#mov("+speed+ ","+turn+ ",0,"+accel_time+")");
+		document.getElementById("fwdb").innerHTML = "STOP";
+		document.getElementById("fwdb").className = "blank text_center";
 		countdown();
 	} else if (dir=="back"){
-		commands.push("#mov(-80)");
+		commands.push("#mov(-"+speed+","+turn+ ",0,"+accel_time+")");
+		document.getElementById("bkwb").className = "blank";
+		document.getElementById("bkwb").innerHTML = "STOP";
 		countdown();
 	} else if (dir=="left"){
-		commands.push("#mov(80,-90)");
+		commands.push("#mov("+speed+",-90,0,"+accel_time+")");
+		document.getElementById("leftb").className = "blank";
+		document.getElementById("leftb").innerHTML = "STOP";
 		countdown();
 	} else if (dir=="right"){
-		commands.push("#mov(80,90)");
+		commands.push("#mov("+speed+",90,0,"+accel_time+")");
+		document.getElementById("rightb").className = "blank";
+		document.getElementById("rightb").innerHTML = "STOP";
 		countdown();
 	} else {
-		queueCommand("#mov(0)");
+		queueCommand("#mov(0,0,0,"+accel_time+")");
 		counter=movetime;
 		//commands.push("#mov(0)");
 	}
 	document.getElementById("status").innerHTML = "Moving " + direction;
 	if (direction == "none"){
 		document.getElementById("status").innerHTML = "Stopped";
+		document.getElementById("fwdb").innerHTML = "";
+		document.getElementById("fwdb").className = "up arrow text_center";
+		document.getElementById("bkwb").innerHTML = "";
+		document.getElementById("bkwb").className = "arrow down";
+		document.getElementById("leftb").innerHTML = "";
+		document.getElementById("leftb").className = "rotate left";
+		document.getElementById("rightb").innerHTML = "";
+		document.getElementById("rightb").className = "rotate right";
         }
 }
 
+function set_speed(){
+	speed = document.getElementById("speed").value;
+	document.getElementById("speed_label").innerHTML = "Speed = "+speed+" %";
+}
+
+function set_turn(){
+	turn = document.getElementById("turn").value;
+	document.getElementById("turn_label").innerHTML = "Turn rate = " +turn;
+}
+
+function set_movetime(){
+	movetime = Number(document.getElementById("movetime").value);
+	document.getElementById("movetime_label").innerHTML = "Move duration = " +String(movetime)+" seconds";
+}
+
+function set_heading(){
+	heading = Number(document.getElementById("heading").value);
+	document.getElementById("heading_label").innerHTML = "Heading = " + document.getElementById("heading").value + " degrees";
+	servos[0] = String(45-heading);
+        servos[1] = String(45+heading);
+        servos[2] = String(45+heading);
+        queueCommand("#set(0,"+servos[0]+")");
+        queueCommand("#set(1,"+servos[1]+")");
+}
+
+
 function servo(target){
         //alert("#set("+target+","+servos[target]+")");
+        servos[target] = document.getElementById(target).value;
 	commands.push("#set("+target+","+servos[target]+")");
 }
 
@@ -181,7 +229,8 @@ function sendCommand(){
 	     }
 	     commands.shift();
         }
-        setTimeout(sendCommand,50+(100-wifi_percentage)*40);
+        //setTimeout(sendCommand,50+(100-wifi_percentage)*40);
+        setTimeout(sendCommand, 1000);
 }
 
 function receiveData(){
@@ -422,8 +471,8 @@ function take_picture(){
                 	<h4>main Controls</h4>
                     <div class="maincontrols">
                     <span class="shadow" id="status" onmousedown="move('none')">Stopped</span>
-                    <a class="arrow up text_center" onmousedown="move('forward')"></a><br>
-                    <a class="rotate left" onmousedown="move('left')"></a> <a class="arrow down" onmousedown="move('back')"></a> <a class="rotate right" onmousedown="move('right')"></a>
+                    <a class="arrow up text_center" id="fwdb" onmousedown="move('forward')"></a><br>
+                    <a class="rotate left" id="leftb" onmousedown="move('left')"></a> <a class="arrow down" id="bkwb" onmousedown="move('back')"></a> <a class="rotate right" id="rightb" onmousedown="move('right')"></a>
                     <div class="clear"></div>
                     </div>
                 </div>
@@ -456,20 +505,32 @@ function take_picture(){
                 </div>
                 
                 <div class="col span_4-5 sep-right left">
-                	<h4>Arm Attachment</h4>
+                	<h4>Drive settings</h4>
                     <div class="arm_attachmemt">
-                    	<div><a class="arrow up" onclick="servoup(0)"></a> <span class="text_center">Shoulder</span> <a class="arrow down" onclick="servodown(0)"></a> 
-
+                    	<div>
+                                <!--<a class="arrow up" onclick="servoup(0)"></a> <span class="text_center">Shoulder</span> <a class="arrow down" onclick="servodown(0)"></a> -->
+                                <label id = "speed_label">Speed = 50 %</label>
+                                <input type="range" max="100" min="0" step="1" id="speed" onmouseup="set_speed()" ontouchend="set_speed()">
                         	<div class="clear"></div>
                         </div>
                         
-                        <div><a class="arrow up" onclick="servoup(1)"></a> <span class="text_center">Elbow</span> <a class="arrow down" onclick="servodown(1)"></a> 
-                        	<div class="clear"></div>
+                        <div>
+                                <!--<a class="arrow up" onclick="servoup(1)"></a> <span class="text_center">Elbow</span> <a class="arrow down" onclick="servodown(1)"></a> -->
+                        	<!--<label id = "turn_label">Turn rate = 0.0</label>
+                                <input type="range" max="1" min="-1" step="0.1" id="turn" onmouseup="set_turn()" ontouchend="set_turn()">
+                                <div class="clear"></div>-->
                         </div>
                         
-                        <div><a class="blank open" onclick="servoup(2)">OPEN</a> <span class="text_center">Open/Close</span> <a class="blank close" onclick="servodown(2)">Close</a> 
-                        	<div class="clear"></div>
+                        <div>
+			        <label id = "heading_label">Heading = 0 degrees</label>
+                                <input type="range" max="40" min="-40" id="heading" onmouseup="set_heading()" ontouchend="set_heading()">
+                                <div class="clear"></div>
                         </div>
+			<div>
+				<label id = "movetime_label">Move duration = 10 seconds</label>
+				<input type="range" max="30" min="0" value="10" id="movetime" onmouseup="set_movetime()" ontouchend="set_movetime()">
+				<div class="clear"></div>
+			</div>
                     </div>
                 </div>
                 
