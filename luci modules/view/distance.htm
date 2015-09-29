@@ -15,59 +15,59 @@
 <html lang="en-US">
 <!--<![endif]-->
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1.0 user-scalable=no">
-<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-<title>Linkia robot simple drive page</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0 user-scalable=no">
+	<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+	<title>Linkia robot simple drive page</title>
 
-<link rel="shortcut icon" href="<%=resource%>/images/favicon.png">
+	<link rel="shortcut icon" href="<%=resource%>/images/favicon.png">
 
-<link rel="stylesheet" href="<%=resource%>/css/font-awesome.min.css">
-<link rel="stylesheet" href="<%=resource%>/css/style.css">
-<link rel="stylesheet" href="<%=resource%>/css/media.css">
+	<link rel="stylesheet" href="<%=resource%>/css/font-awesome.min.css">
+	<link rel="stylesheet" href="<%=resource%>/css/style.css">
+	<link rel="stylesheet" href="<%=resource%>/css/media.css">
 
 <!--[if IE]>
-    <script type="<%=resource%>/ie/selectivizr.js"></script>
-    <noscript><link rel="stylesheet" href="[fallback css]" /></noscript>
-<![endif]-->
+	<script type="<%=resource%>/ie/selectivizr.js"></script>
+	<noscript><link rel="stylesheet" href="[fallback css]" /></noscript>
+	<![endif]-->
 
 <!--[if lt IE 9]>    
-    <script src="<%=resource%>/ie/html5shiv.js"></script>
-    <script src="<%=resource%>/ie/respond.min.js"></script>
-<![endif]-->
+	<script src="<%=resource%>/ie/html5shiv.js"></script>
+	<script src="<%=resource%>/ie/respond.min.js"></script>
+	<![endif]-->
 
-<script type="text/javascript" src="<%=resource%>/js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="<%=resource%>/js/custom.js"></script>
-<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
-<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
-<script type="text/javascript">
+	<script type="text/javascript" src="<%=resource%>/js/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="<%=resource%>/js/custom.js"></script>
+	<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+	<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+	<script type="text/javascript">
 
-var imageN=1;
-var data = ["0","0","0","0","0","0"];
-var commands = [];
-var servos = [0,0,0];
-var dir = "none";
-var dir_old = "none";
-var ip = location.host;
-var wifi_percentage = 100;
-var connection = new WebSocket('ws://'+ip+':2000');
-connection.onopen = function(evt){sendCommand()};
-var has_ws=0;
-var movetime = 10;
-var counter = movetime;
-var speed = "50";
-var heading = "0";
-var turn = "0";
-var accel_time = "1";
-var middpoint = [45,45,45];
+		var imageN=1;
+		var data = ["0","0","0","0","0","0"];
+		var commands = [];
+		var servos = [0,0,0];
+		var dir = "none";
+		var dir_old = "none";
+		var ip = location.host;
+		var wifi_percentage = 100;
+		var connection = new WebSocket('ws://'+ip+':2000');
+		connection.onopen = function(evt){sendCommand()};
+		var has_ws=0;
+		var movetime = 10;
+		var counter = movetime;
+		var speed = "50";
+		var heading = "0";
+		var turn = "0";
+		var accel_time = "1";
+		var middpoint = [45,45,45];
 
-function onload(){
-       read_wifi();
-       testWebSocket();
-       imageUpdate();
-       sendCommand();
-       receiveData();
-}
+		function onload(){
+			read_wifi();
+			testWebSocket();
+			imageUpdate();
+			sendCommand();
+			receiveData();
+		}
 
 //function onclose(){
 //	connection.onclose = function(){};
@@ -77,42 +77,42 @@ function onload(){
 //window.onbeforeunload = onclose();
 
 function testWebSocket() {
-    if ("WebSocket" in window) {
-        has_ws=1;
-    }
-    else {
-        alert("Your browser does not support WebSocket Technology. \\n  Sending commands will have ~1second delay");
-    }
+	if ("WebSocket" in window) {
+		has_ws=1;
+	}
+	else {
+		alert("Your browser does not support WebSocket Technology. \\n  Sending commands will have ~1second delay");
+	}
 }
 
 
 function connectWebSocket(){
-  try{
-    connection = new WebSocket('ws://'+ip+':2000');
+	try{
+		connection = new WebSocket('ws://'+ip+':2000');
   }catch(e){ //throws code 15 if has socket to me babies
-    has_ws=1;
+  	has_ws=1;
   }
 }
 
 function imageUpdate(){
-    var webcam = document.getElementById("webcam");
-    webcam.src = "http://"+ip+":8080/?action=snapshot&n="+ (++imageN);
-    webcam.onerror = function(){
-           webcam.src = "<%=resource%>/images/cam.png";
-    };
-    //setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
+	var webcam = document.getElementById("webcam");
+	webcam.src = "http://"+ip+":8080/?action=snapshot&n="+ (++imageN);
+	webcam.onerror = function(){
+		webcam.src = "<%=resource%>/images/cam.png";
+	};
+	//setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
 }
 
 function countdown(){
-    if (counter == 0){
-	counter = movetime;
-	move("none");
-    }
-    else if(dir!="none"){
-	counter = counter -1;
-	document.getElementById("status").innerHTML = "Moving " + dir +" "+ String(counter) ;
-	setTimeout(countdown,1000);
-    }
+	if (counter == 0){
+		counter = movetime;
+		move("none");
+	}
+	else if(dir!="none"){
+		counter = counter -1;
+		document.getElementById("status").innerHTML = "Moving " + dir +" "+ String(counter) ;
+		setTimeout(countdown,1000);
+	}
 } 
 
 function queueCommand(command){
@@ -125,9 +125,9 @@ function move(direction){
 	if(dir==direction){
 		direction = "none";
 	}
-        else if(dir!="none"){
-                counter=movetime;
-        }
+	else if(dir!="none"){
+		counter=movetime;
+	}
 	dir = direction;
 	if (dir=="none"){
 		//commands.push("#mov(0)");
@@ -169,7 +169,7 @@ function move(direction){
 		document.getElementById("leftb").className = "rotate left";
 		document.getElementById("rightb").innerHTML = "";
 		document.getElementById("rightb").className = "rotate right";
-        }
+	}
 }
 
 function set_speed(){
@@ -191,49 +191,49 @@ function set_heading(){
 	heading = Number(document.getElementById("heading").value);
 	document.getElementById("heading_label").innerHTML = "Heading = " + document.getElementById("heading").value + " degrees";
 	servos[0] = String(45-heading);
-        servos[1] = String(45+heading);
-        servos[2] = String(45+heading);
-        queueCommand("#set(0,"+servos[0]+")");
-        queueCommand("#set(1,"+servos[1]+")");
+	servos[1] = String(45+heading);
+	servos[2] = String(45+heading);
+	queueCommand("#set(0,"+servos[0]+")");
+	queueCommand("#set(1,"+servos[1]+")");
 }
 
 
 function servo(target){
-        //alert("#set("+target+","+servos[target]+")");
-        servos[target] = document.getElementById(target).value;
+	//alert("#set("+target+","+servos[target]+")");
+	servos[target] = document.getElementById(target).value;
 	commands.push("#set("+target+","+servos[target]+")");
 }
 
 function servoup(target){
 	if (servos[target]<180){
-	    servos[target] = servos[target]+5;
-	    servo(target);
+		servos[target] = servos[target]+5;
+		servo(target);
 	}
 }
 
 function servodown(target){
 	if (servos[target]>0){
-	    servos[target] = servos[target]-5;
-	    servo(target);
+		servos[target] = servos[target]-5;
+		servo(target);
 	}
 }
 
 function sendCommand(){
-        if (commands.length>0){
-	     //send
-	     if(has_ws==1){
-		connection.send(commands[0]);
-	     }
-	     else{
-		$.post("<%=controller%>/admin/robot/distance/move","com="+commands[0]);
-	     }
-	     commands.shift();
-        }
-        //setTimeout(sendCommand,50+(100-wifi_percentage)*40);
-        setTimeout(sendCommand, 1000);
-}
+	if (commands.length>0){
+		 //send
+		 if(has_ws==1){
+		 	connection.send(commands[0]);
+		 }
+		 else{
+		 	$.post("<%=controller%>/admin/robot/distance/move","com="+commands[0]);
+		 }
+		 commands.shift();
+		}
+		//setTimeout(sendCommand,50+(100-wifi_percentage)*40);
+		setTimeout(sendCommand, 1000);
+	}
 
-function receiveData(){
+	function receiveData(){
 
 	//read
 	$.post("<%=controller%>/admin/robot/distance/read",function(data){});
@@ -243,69 +243,69 @@ function receiveData(){
 	xmlhttp.onreadystatechange=function(){
 		if (xmlhttp.readyState==4 && xmlhttp.status==200){
 			var data = xmlhttp.responseText;
-                        data = JSON.parse(data);
+			data = JSON.parse(data);
 			data = data.toString();
 			if(data){
-                        	data = data.split(",");
-                        	battery_status(data);
+				data = data.split(",");
+				battery_status(data);
 			}
 		}
 	}
 
 	//xmlhttp.send();
 
-        setTimeout(receiveData,2000);
+	setTimeout(receiveData,2000);
 	
 }
 
 function read_wifi(){
-        XHR.poll(5, '<%=luci.dispatcher.build_url("admin","robot","distance","wifi")%>', null,
-                 function(x, data)
-                 {
-                        var signal = Number(data);
-                        //document.getElementById('wifiTxt').innerHTML = String(data);
-                        var percentage = 100;
-                        if (signal>50){
-                            percentage = 100-2*(signal-50);
-                        }
-                        if (signal== null){
-                            percentage = 0;
-                        }
-                        if (percentage>0){
-                            document.getElementById('wifiTxt').innerHTML = "WIFI " +String(percentage)+"%";
-                            document.getElementById('wifiGauge').setAttribute("style" , "width: "+ String(percentage)+"%;");
-                        } else {
-                            document.getElementById('wifiTxt').innerHTML = "NOT CONNECTED";
-                            document.getElementById('wifiGauge').setAttribute( "style", "width: 0%;");
-                        }
-                        wifi_percentage = percentage;
-                        
-                 }
-        );
+	XHR.poll(5, '<%=luci.dispatcher.build_url("admin","robot","distance","wifi")%>', null,
+		function(x, data)
+		{
+			var signal = Number(data);
+						//document.getElementById('wifiTxt').innerHTML = String(data);
+						var percentage = 100;
+						if (signal>50){
+							percentage = 100-2*(signal-50);
+						}
+						if (signal== null){
+							percentage = 0;
+						}
+						if (percentage>0){
+							document.getElementById('wifiTxt').innerHTML = "WIFI " +String(percentage)+"%";
+							document.getElementById('wifiGauge').setAttribute("style" , "width: "+ String(percentage)+"%;");
+						} else {
+							document.getElementById('wifiTxt').innerHTML = "NOT CONNECTED";
+							document.getElementById('wifiGauge').setAttribute( "style", "width: 0%;");
+						}
+						wifi_percentage = percentage;
+						
+					}
+					);
 }
 
 function battery_status(data){
-    var battery = (Number(data[5])*49/10000).toFixed(2);
-    var percentage = 100;
-    //document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(battery)+"V";
-    if (battery<4.0){
-        if (battery>3.1){
-            percentage = Math.round((battery-3.1)*111);
-        } else {
-            percentage = 0;
-        }
-    }
-    if (battery<2.7){
-        document.getElementById('batteryTxt').innerHTML = "NOT CONNECTED";
-    } else {
-        document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(percentage)+"%";
-    }    
-    document.getElementById('batteryGauge').setAttribute("style" , "width: "+String(percentage)+"%;");
+	var battery = (Number(data[5])*49/10000).toFixed(2);
+	var percentage = 100;
+	//document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(battery)+"V";
+	if (battery<4.0){
+		if (battery>3.1){
+			percentage = Math.round((battery-3.1)*111);
+		} else {
+			percentage = 0;
+		}
+	}
+	if (battery<2.7){
+		document.getElementById('batteryTxt').innerHTML = "NOT CONNECTED";
+	} else {
+		document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(percentage)+"%";
+	}    
+	document.getElementById('batteryGauge').setAttribute("style" , "width: "+String(percentage)+"%;");
 
 }
 
 function record_video(){
-        alert("Recording videos isn't implemented yet!");
+	alert("Recording videos isn't implemented yet!");
 }
 
 function take_picture(){
@@ -322,248 +322,248 @@ function take_picture(){
 
 <body onload="onload()">
 
-<!--Header start-->
-<header class="topheader">
-	<!--top header start-->
-    	<a class="menubarHandler" href="javascript:void(0)">Menu</a>
-        <nav class="top_menu">
-            <div class="container">
-                <div class="row">
-                
-                    <div class="col span_4">
-                            <div class="inner dashboard">
-                               <a href='<%=luci.dispatcher.build_url("admin/robot/index")%>'> 
-                                    <span class="icon"><i class="fa fa-dashboard"></i></span>
-                                    <h4>Dashboard</h4>
-                                </a>
-                            </div>
-                        </div>
-                        
-                	<div class="col span_4">
-                        <div class="inner startdriving">
-                            <a href='<%=luci.dispatcher.build_url("admin/robot/distance")%>'> 
-                                <span class="icon"><i class="fa fa-gamepad"></i></span>
-                                <h4>START DRIVING</h4>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="col span_4">
-                        <div class="inner customcontros">
-                            <a href='<%=luci.dispatcher.build_url("admin/robot/mycontrols")%>'> 
-                                <span class="icon"><i class="fa fa-gamepad rotated"></i><i class="fa fa-gamepad"></i></span>
-                                <h4>CUSTOM CONTROLS</h4>  
-                            </a>                          
-                        </div>
-                    </div>
-                    <div class="col span_4">
-                        <div class="inner">
-                            <a href='<%=luci.dispatcher.build_url("admin/robot/edit-controls")%>'> 
-                                <span class="icons-css"><i class="fa fa-wrench"></i></span>
-                                <h4>EDIT MY CONTROLLER</h4>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="col span_4">
-                        <div class="inner">
-                            <a href='<%=luci.dispatcher.build_url("admin/robot/help")%>'> 
-                                <span class="icons-css"><i class="fa fa-info-circle"></i></span>
-                                <h4>HELP &amp; MANUAL</h4>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="col span_4">
-                        <div class="inner">
-                            <a href='<%=luci.dispatcher.build_url("admin/robot/settings")%>'> 
-                                <span class="icons-css"><i class="fa fa-gear"></i></span>
-                                <h4>SETTINGS</h4>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="col span_4">
-                        <div class="inner">
-                            <a href='<%=luci.dispatcher.build_url("admin/status/overview")%>'> 
-                                <span class="icons-css"><i class="fa fa-wifi"></i></span>
-                                <h4>ROUTER SETUP</h4>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="col span_4">
-                        <div class="inner">
-                            <a href='<%=luci.dispatcher.build_url("admin/robot/editor")%>'> 
-                                <span class="icons-css"><i class="fa fa-pencil"></i></span>
-                                <h4>WRITE CODE</h4>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="col span_4">
-                        <div class="inner">
-                            <a href='<%=luci.dispatcher.build_url("admin/logout")%>'> 
-                                <span class="icons-css"><i class="fa fa-sign-out"></i></span>
-                                <h4>Log Out</h4>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        
-        <div class="smallLogo"><img src="<%=resource%>/images/smallogoblue.png" alt=""></div>
-        
-        <div class="header-battery">  
-            <div class="wifi-battery-text" id="batteryTxt"> BATTERY 100% </div>
-            <div class="battery" id="batteryGauge" style="width: 100%;"></div>
-        </div>
-        
-        
-        <div class="header-wifi">  
-            <div class="wifi-battery-text" id="wifiTxt"> WIFI 100% </div>
-            <div class="wifi" id="wifiGauge" style="width: 100%;"></div>
-        </div>
-        
-    <!--top header END-->
-</header>  
+	<!--Header start-->
+	<header class="topheader">
+		<!--top header start-->
+		<a class="menubarHandler" href="javascript:void(0)">Menu</a>
+		<nav class="top_menu">
+			<div class="container">
+				<div class="row">
+					
+					<div class="col span_4">
+						<div class="inner dashboard">
+							<a href='<%=luci.dispatcher.build_url("admin/robot/index")%>'> 
+								<span class="icon"><i class="fa fa-dashboard"></i></span>
+								<h4>Dashboard</h4>
+							</a>
+						</div>
+					</div>
+					
+					<div class="col span_4">
+						<div class="inner startdriving">
+							<a href='<%=luci.dispatcher.build_url("admin/robot/distance")%>'> 
+								<span class="icon"><i class="fa fa-gamepad"></i></span>
+								<h4>START DRIVING</h4>
+							</a>
+						</div>
+					</div>
+					
+					<div class="col span_4">
+						<div class="inner customcontros">
+							<a href='<%=luci.dispatcher.build_url("admin/robot/mycontrols")%>'> 
+								<span class="icon"><i class="fa fa-gamepad rotated"></i><i class="fa fa-gamepad"></i></span>
+								<h4>CUSTOM CONTROLS</h4>  
+							</a>                          
+						</div>
+					</div>
+					<div class="col span_4">
+						<div class="inner">
+							<a href='<%=luci.dispatcher.build_url("admin/robot/edit-controls")%>'> 
+								<span class="icons-css"><i class="fa fa-wrench"></i></span>
+								<h4>EDIT MY CONTROLLER</h4>
+							</a>
+						</div>
+					</div>
+					
+					<div class="col span_4">
+						<div class="inner">
+							<a href='<%=luci.dispatcher.build_url("admin/robot/help")%>'> 
+								<span class="icons-css"><i class="fa fa-info-circle"></i></span>
+								<h4>HELP &amp; MANUAL</h4>
+							</a>
+						</div>
+					</div>
+					
+					<div class="col span_4">
+						<div class="inner">
+							<a href='<%=luci.dispatcher.build_url("admin/robot/settings")%>'> 
+								<span class="icons-css"><i class="fa fa-gear"></i></span>
+								<h4>SETTINGS</h4>
+							</a>
+						</div>
+					</div>
+					
+					<div class="col span_4">
+						<div class="inner">
+							<a href='<%=luci.dispatcher.build_url("admin/status/overview")%>'> 
+								<span class="icons-css"><i class="fa fa-wifi"></i></span>
+								<h4>ROUTER SETUP</h4>
+							</a>
+						</div>
+					</div>
+					
+					<div class="col span_4">
+						<div class="inner">
+							<a href='<%=luci.dispatcher.build_url("admin/robot/editor")%>'> 
+								<span class="icons-css"><i class="fa fa-pencil"></i></span>
+								<h4>WRITE CODE</h4>
+							</a>
+						</div>
+					</div>
+					
+					<div class="col span_4">
+						<div class="inner">
+							<a href='<%=luci.dispatcher.build_url("admin/logout")%>'> 
+								<span class="icons-css"><i class="fa fa-sign-out"></i></span>
+								<h4>Log Out</h4>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+		
+		<div class="smallLogo"><img src="<%=resource%>/images/smallogoblue.png" alt=""></div>
+		
+		<div class="header-battery">  
+			<div class="wifi-battery-text" id="batteryTxt"> BATTERY 100% </div>
+			<div class="battery" id="batteryGauge" style="width: 100%;"></div>
+		</div>
+		
+		
+		<div class="header-wifi">  
+			<div class="wifi-battery-text" id="wifiTxt"> WIFI 100% </div>
+			<div class="wifi" id="wifiGauge" style="width: 100%;"></div>
+		</div>
+		
+		<!--top header END-->
+	</header>  
 
 	<!--figure part Start-->
-    <div class="figure_part">    	
-    	<div class="container">
-        	<figure>
-                
-                <!--<div class="cam-controls" id="webcam">-->
-                        
-                <div>
-                <!--<noscript>-->     
-                <img id="webcam" width="800" src="http://192.168.1.1:8080/?action=snapshot" />
-                <!--</noscript>-->
-                </div>        
+	<div class="figure_part">    	
+		<div class="container">
+			<figure>
+				
+				<!--<div class="cam-controls" id="webcam">-->
+				
+				<div>
+					<!--<noscript>-->     
+					<img id="webcam" width="800" src="http://192.168.1.1:8080/?action=snapshot" />
+					<!--</noscript>-->
+				</div>        
 
 
-                
-                <div class="cam-controls">
-                	<a class="video" onclick="record_video()"></a> <a class="image" onclick="take_picture()"></a>
-                </div>
-            </figure>
-        </div>
-    
-    </div>
-    <!--figure part End-->
-    
-    <!--Logo part Start-->
-    <div class="small_logo_part">    	
-    	<div class="container">
-            <center><a class="small_logo">Ral-Rover</a></center>
-        </div>
-    
-    </div>
-    <!--Logo part End-->
+				
+				<div class="cam-controls">
+					<a class="video" onclick="record_video()"></a> <a class="image" onclick="take_picture()"></a>
+				</div>
+			</figure>
+		</div>
+		
+	</div>
+	<!--figure part End-->
 	
-    
-    <!--Content part start-->
-    <div class="main_content controls">
-    	<div class="container">
-            <div class="row">
-            	<div class="col span_4-5 sep-left right">
-                	<h4>main Controls</h4>
-                    <div class="maincontrols">
-                    <span class="shadow" id="status" onmousedown="move('none')">Stopped</span>
-                    <a class="arrow up text_center" id="fwdb" onmousedown="move('forward')"></a><br>
-                    <a class="rotate left" id="leftb" onmousedown="move('left')"></a> <a class="arrow down" id="bkwb" onmousedown="move('back')"></a> <a class="rotate right" id="rightb" onmousedown="move('right')"></a>
-                    <div class="clear"></div>
-                    </div>
-                </div>
-                
-                <div class="col span_3-5 right">
-                	<h4>Distance</h4>
-                    <div class="distancecontainer">
-                    	<div class="distance">
-                        	<!--alert and warning message corners start-->
-                        	<div class="top-left no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
-                            <div class="top-right no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
-                            <div class="bottom-left no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
-                            <div class="bottom-right no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
-                            <!--alert and warning message corners end-->
-                            
-                            <!--alert and warning message start-->
-                            <div class="message no_signal"></div><!--replace clear warnin, no_signal, alert to show message icon-->
-                            <!--alert and warning message start-->
-                            
-                            
-                            <!--alert and warning message start-->
-                            <div class="text clear">Clear</div> <!--add class show for show text-->
-                            <div class="text too_close">Too Close</div>
-                            <div class="text stop">Stop!</div>
-                            <div class="text no_signal show">NO SIGNAL</div>
-                            <!--alert and warning message start-->
-                        </div>
-                    </div>
-                
-                </div>
-                
-                <div class="col span_4-5 sep-right left">
-                	<h4>Drive settings</h4>
-                    <div class="arm_attachmemt">
-                    	<div>
-                                <!--<a class="arrow up" onclick="servoup(0)"></a> <span class="text_center">Shoulder</span> <a class="arrow down" onclick="servodown(0)"></a> -->
-                                <label id = "speed_label">Speed = 50 %</label>
-                                <input type="range" max="100" min="0" step="1" id="speed" onmouseup="set_speed()" ontouchend="set_speed()">
-                        	<div class="clear"></div>
-                        </div>
-                        
-                        <div>
-                                <!--<a class="arrow up" onclick="servoup(1)"></a> <span class="text_center">Elbow</span> <a class="arrow down" onclick="servodown(1)"></a> -->
-                        	<!--<label id = "turn_label">Turn rate = 0.0</label>
-                                <input type="range" max="1" min="-1" step="0.1" id="turn" onmouseup="set_turn()" ontouchend="set_turn()">
-                                <div class="clear"></div>-->
-                        </div>
-                        
-                        <div>
-			        <label id = "heading_label">Heading = 0 degrees</label>
-                                <input type="range" max="40" min="-40" id="heading" onmouseup="set_heading()" ontouchend="set_heading()">
-                                <div class="clear"></div>
-                        </div>
-			<div>
-				<label id = "movetime_label">Move duration = 10 seconds</label>
-				<input type="range" max="30" min="0" value="10" id="movetime" onmouseup="set_movetime()" ontouchend="set_movetime()">
-				<div class="clear"></div>
+	<!--Logo part Start-->
+	<div class="small_logo_part">    	
+		<div class="container">
+			<center><a class="small_logo">Ral-Rover</a></center>
+		</div>
+		
+	</div>
+	<!--Logo part End-->
+	
+	
+	<!--Content part start-->
+	<div class="main_content controls">
+		<div class="container">
+			<div class="row">
+				<div class="col span_4-5 sep-left right">
+					<h4>main Controls</h4>
+					<div class="maincontrols">
+						<span class="shadow" id="status" onmousedown="move('none')">Stopped</span>
+						<a class="arrow up text_center" id="fwdb" onmousedown="move('forward')"></a><br>
+						<a class="rotate left" id="leftb" onmousedown="move('left')"></a> <a class="arrow down" id="bkwb" onmousedown="move('back')"></a> <a class="rotate right" id="rightb" onmousedown="move('right')"></a>
+						<div class="clear"></div>
+					</div>
+				</div>
+				
+				<div class="col span_3-5 right">
+					<h4>Distance</h4>
+					<div class="distancecontainer">
+						<div class="distance">
+							<!--alert and warning message corners start-->
+							<div class="top-left no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
+							<div class="top-right no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
+							<div class="bottom-left no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
+							<div class="bottom-right no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
+							<!--alert and warning message corners end-->
+							
+							<!--alert and warning message start-->
+							<div class="message no_signal"></div><!--replace clear warnin, no_signal, alert to show message icon-->
+							<!--alert and warning message start-->
+							
+							
+							<!--alert and warning message start-->
+							<div class="text clear">Clear</div> <!--add class show for show text-->
+							<div class="text too_close">Too Close</div>
+							<div class="text stop">Stop!</div>
+							<div class="text no_signal show">NO SIGNAL</div>
+							<!--alert and warning message start-->
+						</div>
+					</div>
+					
+				</div>
+				
+				<div class="col span_4-5 sep-right left">
+					<h4>Drive settings</h4>
+					<div class="arm_attachmemt">
+						<div>
+							<!--<a class="arrow up" onclick="servoup(0)"></a> <span class="text_center">Shoulder</span> <a class="arrow down" onclick="servodown(0)"></a> -->
+							<label id = "speed_label">Speed = 50 %</label>
+							<input type="range" max="100" min="0" step="1" id="speed" onmouseup="set_speed()" ontouchend="set_speed()">
+							<div class="clear"></div>
+						</div>
+						
+						<div>
+							<!--<a class="arrow up" onclick="servoup(1)"></a> <span class="text_center">Elbow</span> <a class="arrow down" onclick="servodown(1)"></a> -->
+							<!--<label id = "turn_label">Turn rate = 0.0</label>
+								<input type="range" max="1" min="-1" step="0.1" id="turn" onmouseup="set_turn()" ontouchend="set_turn()">
+								<div class="clear"></div>-->
+							</div>
+							
+							<div>
+								<label id = "heading_label">Heading = 0 degrees</label>
+								<input type="range" max="40" min="-40" id="heading" onmouseup="set_heading()" ontouchend="set_heading()">
+								<div class="clear"></div>
+							</div>
+							<div>
+								<label id = "movetime_label">Move duration = 10 seconds</label>
+								<input type="range" max="30" min="0" value="10" id="movetime" onmouseup="set_movetime()" ontouchend="set_movetime()">
+								<div class="clear"></div>
+							</div>
+						</div>
+					</div>
+					
+					
+					
+					
+				</div>
 			</div>
-                    </div>
-                </div>
-                
-                 
-                
-                
-            </div>
-        </div>
-    </div>
-    <!--Content part end-->
-   
- 
-    
- 
-<!--Footer start-->
-<footer>
-	<div class="container">
-    	<div class="row">
-        	<div class="col span_4">
-            	<img src="<%=resource%>/images/sciencetechnology.png" alt="">
-            </div>
-            
-        	<div class="col span_4 footer-logo-mid" >
-            	<img src="<%=resource%>/images/activerobotsdark.png" alt="">
-            </div>
-            
-            <div class="col span_4 right text_right">
-            	<img src="<%=resource%>/images/ralspacelogo.png" alt="">
-            </div>
-        </div>
-    </div>
-</footer>
-<!--Footer end-->
+		</div>
+		<!--Content part end-->
+		
+		
+		
+		
+		<!--Footer start-->
+		<footer>
+			<div class="container">
+				<div class="row">
+					<div class="col span_4">
+						<img src="<%=resource%>/images/sciencetechnology.png" alt="">
+					</div>
+					
+					<div class="col span_4 footer-logo-mid" >
+						<img src="<%=resource%>/images/activerobotsdark.png" alt="">
+					</div>
+					
+					<div class="col span_4 right text_right">
+						<img src="<%=resource%>/images/ralspacelogo.png" alt="">
+					</div>
+				</div>
+			</div>
+		</footer>
+		<!--Footer end-->
 
-</body>
-</html>
+	</body>
+	</html>
