@@ -50,9 +50,9 @@ def get(target, time = 0, duration = 0, delay = 0):
         discard = var.devices[0][2].read(var.devices[0][2].inWaiting())
     
 def mov(power,turn=0,time = 0, duration = 0, delay = 0):
-    power, turn = int(power), int(turn)
-    x = math.cos(math.radians(turn))*power*var.motors[0]/50 #% calibration doubled 100=> is 200% number between 0-200
-    y = math.sin(math.radians(turn))*power*var.motors[3]/50
+    power, turn, time, duration, delay = int(power), int(turn), int(time), int(duration), int(delay)
+    x = math.cos(math.radians(turn))*power*var.motors[0]/100
+    y = math.sin(math.radians(turn))*power*var.motors[3]/100
     right = x+ y
     left = x - y
     direction = 0
