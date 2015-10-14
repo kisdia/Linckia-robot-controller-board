@@ -1,1 +1,0 @@
-These are files that are not included in default build but can be used for various functionality.
