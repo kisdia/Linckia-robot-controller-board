@@ -4,11 +4,10 @@ config wifi-device 'radio0'
 	option htmod 'HT20'
         option country 'GB'
         option channel 'auto'
-	
+
 config wifi-iface
 	option device 'radio0'
 	option network 'lan'
 	option mode 'ap'
-	option ssid 'Surveyor'
+	option ssid 'Newton'
 	option encryption 'none'
-

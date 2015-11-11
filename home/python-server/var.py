@@ -60,3 +60,4 @@ lost_data = None
 #driving
 turn=0
 angles = [0,0,0]
+speed = 0

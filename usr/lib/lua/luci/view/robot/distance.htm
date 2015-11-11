@@ -190,11 +190,12 @@ function set_movetime(){
 function set_heading(){
 	heading = Number(document.getElementById("heading").value);
 	document.getElementById("heading_label").innerHTML = "Heading = " + document.getElementById("heading").value + " degrees";
-	servos[0] = String(45-heading);
-	servos[1] = String(45+heading);
-	servos[2] = String(45+heading);
+	servos[0] = String(45+heading);
+	servos[1] = String(45-heading);
+	servos[2] = String(45-heading);
 	queueCommand("#set(0,"+servos[0]+")");
 	queueCommand("#set(1,"+servos[1]+")");
+	queueCommand("#set(2,"+servos[2]+")");
 }
 
 

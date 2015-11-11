@@ -62,17 +62,18 @@ def mov(power,turn=0,time = 0, duration = 0, delay = 0):
 	y = math.sin(math.radians(turn))*power
 	if abs(turn)==90:
 		var.turn = 90
-		set(0,170)
-		set(1,170)
-		#set(2,170)
+		set(0,160)
+		set(1,160)
+		set(2,160)
 		t.sleep(4)
 	elif turn<>var.turn:
 		var.turn = turn
 		set(0, 45-turn)
 		set(1, 45+turn)
-		#set(2, 45-turn)
+		set(2, 45-turn)
 		if turn<>0:
-			t.sleep(3)
+			if var.speed<>power:
+				t.sleep(3)
 	right = x+ y
 	left = x - y
 	direction = 0
@@ -87,6 +88,7 @@ def mov(power,turn=0,time = 0, duration = 0, delay = 0):
 		left = abs(left)
 	commandLeft1 = chr(255)+chr(1)+chr(2)+chr(direction)+chr(int(round(left)))+chr(duration)+chr(0)+chr(254)
 	commandLeft2 = chr(255)+chr(1)+chr(4)+chr(direction)+chr(int(round(left)))+chr(duration)+chr(0)+chr(254)
+	var.speed = power
 	var.devices[0][2].write(commandRight1)
 	var.devices[0][2].write(commandRight2)
 	var.devices[0][2].write(commandLeft1)

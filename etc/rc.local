@@ -3,10 +3,10 @@
 
 #Essencial script for robot
 
-python /home/startup.py 
+#python /home/startup.py
 python /home/python-server/run.py &
-python /home/postman.py &
-python /home/receive.py &
+#python /home/postman.py &
+#python /home/receive.py &
 
 #put your own scripts bellow this line
 
