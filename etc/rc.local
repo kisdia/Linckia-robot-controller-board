@@ -1,13 +1,12 @@
 #Put your custom commands here that should be executed once
 #the system init finished
 
-#Essencial script for robot
+# Essential scripts for robot
 
-#python /home/startup.py
 python /home/python-server/run.py &
 #python /home/postman.py &
 #python /home/receive.py &
 
-#put your own scripts bellow this line
+# put your own scripts below this line
 
 exit 0
