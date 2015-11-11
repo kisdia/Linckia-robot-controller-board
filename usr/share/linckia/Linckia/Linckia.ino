@@ -1,8 +1,8 @@
 /*
  * ------------------------------
- *  Asteroidea version 4.2
+ *  Linckia version 6.4
  * ------------------------------
- * Last modified:  1 May 2014
+ * Last modified:  27 Sept 2015
  * Group: RAL Space Autonomous Systems Group
  * Contact: Aron Kisdi aron.kisdi@stfc.ac.uk
  * Organisation: RAL Space, STFC

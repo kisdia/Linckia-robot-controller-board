@@ -10,6 +10,6 @@ config wifi-iface
 	option device 'radio0'
 	option network 'lan'
 	option mode 'ap'
-	option ssid 'Robot'
+	option ssid 'Surveyor'
 	option encryption 'none'
 

@@ -31,7 +31,7 @@
 	<noscript><link rel="stylesheet" href="[fallback css]" /></noscript>
 	<![endif]-->
 
-<!--[if lt IE 9]>    
+<!--[if lt IE 9]>
 	<script src="<%=resource%>/ie/html5shiv.js"></script>
 	<script src="<%=resource%>/ie/respond.min.js"></script>
 	<![endif]-->
@@ -58,7 +58,7 @@
 		var speed = "50";
 		var heading = "0";
 		var turn = "0";
-		var accel_time = "1";
+		var accel_time = "0";
 		var middpoint = [45,45,45];
 
 		function onload(){
@@ -113,7 +113,7 @@ function countdown(){
 		document.getElementById("status").innerHTML = "Moving " + dir +" "+ String(counter) ;
 		setTimeout(countdown,1000);
 	}
-} 
+}
 
 function queueCommand(command){
 	if (command!=commands[commands.length-1]){
@@ -255,7 +255,7 @@ function sendCommand(){
 	//xmlhttp.send();
 
 	setTimeout(receiveData,2000);
-	
+
 }
 
 function read_wifi(){
@@ -279,7 +279,7 @@ function read_wifi(){
 							document.getElementById('wifiGauge').setAttribute( "style", "width: 0%;");
 						}
 						wifi_percentage = percentage;
-						
+
 					}
 					);
 }
@@ -299,7 +299,7 @@ function battery_status(data){
 		document.getElementById('batteryTxt').innerHTML = "NOT CONNECTED";
 	} else {
 		document.getElementById('batteryTxt').innerHTML = "BATTERY "+ String(percentage)+"%";
-	}    
+	}
 	document.getElementById('batteryGauge').setAttribute("style" , "width: "+String(percentage)+"%;");
 
 }
@@ -329,81 +329,81 @@ function take_picture(){
 		<nav class="top_menu">
 			<div class="container">
 				<div class="row">
-					
+
 					<div class="col span_4">
 						<div class="inner dashboard">
-							<a href='<%=luci.dispatcher.build_url("admin/robot/index")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/robot/index")%>'>
 								<span class="icon"><i class="fa fa-dashboard"></i></span>
 								<h4>Dashboard</h4>
 							</a>
 						</div>
 					</div>
-					
+
 					<div class="col span_4">
 						<div class="inner startdriving">
-							<a href='<%=luci.dispatcher.build_url("admin/robot/distance")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/robot/distance")%>'>
 								<span class="icon"><i class="fa fa-gamepad"></i></span>
 								<h4>START DRIVING</h4>
 							</a>
 						</div>
 					</div>
-					
+
 					<div class="col span_4">
 						<div class="inner customcontros">
-							<a href='<%=luci.dispatcher.build_url("admin/robot/mycontrols")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/robot/mycontrols")%>'>
 								<span class="icon"><i class="fa fa-gamepad rotated"></i><i class="fa fa-gamepad"></i></span>
-								<h4>CUSTOM CONTROLS</h4>  
-							</a>                          
+								<h4>CUSTOM CONTROLS</h4>
+							</a>
 						</div>
 					</div>
 					<div class="col span_4">
 						<div class="inner">
-							<a href='<%=luci.dispatcher.build_url("admin/robot/edit-controls")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/robot/edit-controls")%>'>
 								<span class="icons-css"><i class="fa fa-wrench"></i></span>
 								<h4>EDIT MY CONTROLLER</h4>
 							</a>
 						</div>
 					</div>
-					
+
 					<div class="col span_4">
 						<div class="inner">
-							<a href='<%=luci.dispatcher.build_url("admin/robot/help")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/robot/help")%>'>
 								<span class="icons-css"><i class="fa fa-info-circle"></i></span>
 								<h4>HELP &amp; MANUAL</h4>
 							</a>
 						</div>
 					</div>
-					
+
 					<div class="col span_4">
 						<div class="inner">
-							<a href='<%=luci.dispatcher.build_url("admin/robot/settings")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/robot/settings")%>'>
 								<span class="icons-css"><i class="fa fa-gear"></i></span>
 								<h4>SETTINGS</h4>
 							</a>
 						</div>
 					</div>
-					
+
 					<div class="col span_4">
 						<div class="inner">
-							<a href='<%=luci.dispatcher.build_url("admin/status/overview")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/status/overview")%>'>
 								<span class="icons-css"><i class="fa fa-wifi"></i></span>
 								<h4>ROUTER SETUP</h4>
 							</a>
 						</div>
 					</div>
-					
+
 					<div class="col span_4">
 						<div class="inner">
-							<a href='<%=luci.dispatcher.build_url("admin/robot/editor")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/robot/editor")%>'>
 								<span class="icons-css"><i class="fa fa-pencil"></i></span>
 								<h4>WRITE CODE</h4>
 							</a>
 						</div>
 					</div>
-					
+
 					<div class="col span_4">
 						<div class="inner">
-							<a href='<%=luci.dispatcher.build_url("admin/logout")%>'> 
+							<a href='<%=luci.dispatcher.build_url("admin/logout")%>'>
 								<span class="icons-css"><i class="fa fa-sign-out"></i></span>
 								<h4>Log Out</h4>
 							</a>
@@ -412,57 +412,57 @@ function take_picture(){
 				</div>
 			</div>
 		</nav>
-		
+
 		<div class="smallLogo"><img src="<%=resource%>/images/smallogoblue.png" alt=""></div>
-		
-		<div class="header-battery">  
+
+		<div class="header-battery">
 			<div class="wifi-battery-text" id="batteryTxt"> BATTERY 100% </div>
 			<div class="battery" id="batteryGauge" style="width: 100%;"></div>
 		</div>
-		
-		
-		<div class="header-wifi">  
+
+
+		<div class="header-wifi">
 			<div class="wifi-battery-text" id="wifiTxt"> WIFI 100% </div>
 			<div class="wifi" id="wifiGauge" style="width: 100%;"></div>
 		</div>
-		
+
 		<!--top header END-->
-	</header>  
+	</header>
 
 	<!--figure part Start-->
-	<div class="figure_part">    	
+	<div class="figure_part">
 		<div class="container">
 			<figure>
-				
+
 				<!--<div class="cam-controls" id="webcam">-->
-				
+
 				<div>
-					<!--<noscript>-->     
+					<!--<noscript>-->
 					<img id="webcam" width="800" src="http://192.168.1.1:8080/?action=snapshot" />
 					<!--</noscript>-->
-				</div>        
+				</div>
 
 
-				
+
 				<div class="cam-controls">
 					<a class="video" onclick="record_video()"></a> <a class="image" onclick="take_picture()"></a>
 				</div>
 			</figure>
 		</div>
-		
+
 	</div>
 	<!--figure part End-->
-	
+
 	<!--Logo part Start-->
-	<div class="small_logo_part">    	
+	<div class="small_logo_part">
 		<div class="container">
 			<center><a class="small_logo">Ral-Rover</a></center>
 		</div>
-		
+
 	</div>
 	<!--Logo part End-->
-	
-	
+
+
 	<!--Content part start-->
 	<div class="main_content controls">
 		<div class="container">
@@ -476,7 +476,7 @@ function take_picture(){
 						<div class="clear"></div>
 					</div>
 				</div>
-				
+
 				<div class="col span_3-5 right">
 					<h4>Distance</h4>
 					<div class="distancecontainer">
@@ -487,12 +487,12 @@ function take_picture(){
 							<div class="bottom-left no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
 							<div class="bottom-right no_signal"></div><!--Change class alert to warnin, no_signal, alert according to need-->
 							<!--alert and warning message corners end-->
-							
+
 							<!--alert and warning message start-->
 							<div class="message no_signal"></div><!--replace clear warnin, no_signal, alert to show message icon-->
 							<!--alert and warning message start-->
-							
-							
+
+
 							<!--alert and warning message start-->
 							<div class="text clear">Clear</div> <!--add class show for show text-->
 							<div class="text too_close">Too Close</div>
@@ -501,9 +501,9 @@ function take_picture(){
 							<!--alert and warning message start-->
 						</div>
 					</div>
-					
+
 				</div>
-				
+
 				<div class="col span_4-5 sep-right left">
 					<h4>Drive settings</h4>
 					<div class="arm_attachmemt">
@@ -513,14 +513,14 @@ function take_picture(){
 							<input type="range" max="100" min="0" step="1" id="speed" onmouseup="set_speed()" ontouchend="set_speed()">
 							<div class="clear"></div>
 						</div>
-						
+
 						<div>
 							<!--<a class="arrow up" onclick="servoup(1)"></a> <span class="text_center">Elbow</span> <a class="arrow down" onclick="servodown(1)"></a> -->
 							<!--<label id = "turn_label">Turn rate = 0.0</label>
 								<input type="range" max="1" min="-1" step="0.1" id="turn" onmouseup="set_turn()" ontouchend="set_turn()">
 								<div class="clear"></div>-->
 							</div>
-							
+
 							<div>
 								<label id = "heading_label">Heading = 0 degrees</label>
 								<input type="range" max="40" min="-40" id="heading" onmouseup="set_heading()" ontouchend="set_heading()">
@@ -533,18 +533,18 @@ function take_picture(){
 							</div>
 						</div>
 					</div>
-					
-					
-					
-					
+
+
+
+
 				</div>
 			</div>
 		</div>
 		<!--Content part end-->
-		
-		
-		
-		
+
+
+
+
 		<!--Footer start-->
 		<footer>
 			<div class="container">
@@ -552,11 +552,11 @@ function take_picture(){
 					<div class="col span_4">
 						<img src="<%=resource%>/images/sciencetechnology.png" alt="">
 					</div>
-					
+
 					<div class="col span_4 footer-logo-mid" >
 						<img src="<%=resource%>/images/activerobotsdark.png" alt="">
 					</div>
-					
+
 					<div class="col span_4 right text_right">
 						<img src="<%=resource%>/images/ralspacelogo.png" alt="">
 					</div>
