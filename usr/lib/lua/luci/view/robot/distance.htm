@@ -98,9 +98,9 @@ function imageUpdate(){
 	var webcam = document.getElementById("webcam");
 	webcam.src = "http://"+ip+":8080/?action=snapshot&n="+ (++imageN);
 	webcam.onerror = function(){
-		webcam.src = "<%=resource%>/images/cam.png";
+	webcam.src = "<%=resource%>/images/cam.png";
 	};
-	//setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
+	setTimeout(imageUpdate,200+(100-wifi_percentage)*40);
 }
 
 function countdown(){
