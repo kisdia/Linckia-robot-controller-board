@@ -28,6 +28,8 @@ int motor3en = 5; //motor 3 enable Digital pin 5 PWM
 int motor4ph = 7; //motor 4 phase Digital pin 7
 int motor4en = 13; //motor 4 enable Digital pin 13 PWM
 
+int routeren = 2; //Digital pin 2 for enabling 3.3V regulator
+
 // Common servo setup values
 #define MIN_PULSE 1050 // minimum servo position, us microseconds
 #define MAX_PULSE 1950 // maximum servo position, us microseconds
@@ -247,6 +249,13 @@ void CommandReceived(int command[6]){
       //ping
       if (command[0] == 5){
         Return(104,0,0,0);
+      } // End of Handshake
+      
+      //restart router
+      if (command[0] == 6){
+        digitalWrite(routeren, LOW);
+        delay(100);
+        digitalWrite(routeren, HIGH);
       } // End of Handshake
 }
 
