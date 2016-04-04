@@ -200,10 +200,6 @@ void ReadAnalog(int targetPin){
 void CommandReceived(int command[6]){
   // check each part of the command
       //Return(command[0],command[1],command[2],command[3]);
-      if (command[0] > 5){
-        //Error invalid command
-        Return(103,command[0],0,0);
-      } // End of if invalid command
 
       //MOTOR COMMAND
       if (command[0] == 1){
