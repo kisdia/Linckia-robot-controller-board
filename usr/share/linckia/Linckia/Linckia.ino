@@ -262,9 +262,11 @@ void CommandReceived(int command[6]){
 
       // version information
       if (command[0] == 7){
+        Serial.write(255);
         Serial.println(LINCKIA_VERSION);
         Serial.println(LINCKIA_VERSION_DATE);
         Serial.println(__DATE__);
+        Serial.write(254);
       }
 }
 
