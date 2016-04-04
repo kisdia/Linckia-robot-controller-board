@@ -1,13 +1,15 @@
 /*
  * ------------------------------
- *  Linckia version 6.4
+ *  Linckia Arduino Code
  * ------------------------------
- * Last modified:  27 Sept 2015
  * Group: RAL Space Autonomous Systems Group
  * Contact: Aron Kisdi aron.kisdi@stfc.ac.uk
  * Organisation: RAL Space, STFC
  * ------------------------------
  */
+
+#define LINCKIA_VERSION "6.5"
+#define LINCKIA_VERSION_DATE "04 Apr 2016"
 
 // Import the Arduino Servo library
 #include <Metro.h>
@@ -257,6 +259,13 @@ void CommandReceived(int command[6]){
         delay(100);
         digitalWrite(routeren, HIGH);
       } // End of Handshake
+
+      // version information
+      if (command[0] == 7){
+        Serial.println(LINCKIA_VERSION);
+        Serial.println(LINCKIA_VERSION_DATE);
+        Serial.println(__DATE__);
+      }
 }
 
 void MoveActuators(){
